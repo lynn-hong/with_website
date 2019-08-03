@@ -1,0 +1,10 @@
+*.pyc
+*.txt
+*.ini
+*.cnf
+*.out
+.config/
+*/migrations/
+*/__pycache__/
+kakao/api_test/
+*/static/

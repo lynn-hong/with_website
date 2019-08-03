@@ -1,0 +1,25 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+
+    <!-- 봉사신청 현황 -->
+    <section id="volunteer" class="p-t-50 p-b-120">
+        <div class="container" style="padding: 0 !important;">
+            <div class="row">
+                <div class="col-lg-12 center" style="text-align: center;">
+                    <h2>{{ message }}</h2>
+                    <p>지금 바로 '나와의 채팅방'을 확인해보세요!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+<script>
+    document.getElementById('header-inner').style.backgroundColor = "gray";
+</script>
+
+{% endblock %}

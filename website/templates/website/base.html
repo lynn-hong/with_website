@@ -1,0 +1,173 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="Lynn Hong" />
+    <meta name="description" content="서교동성당 청년봉사단체 W.I.T.H">
+    <!-- Document title -->
+    <title>위드 | 서교동성당 청년봉사단체</title>
+    <!-- Stylesheets & Fonts -->
+    <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/f4fde1205d.js"></script>
+    <link href="{% static 'css/my.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script>
+        //paste this code under the head tag or in a separate js file.
+        // Wait for window load
+        $(window).load(function() {
+            // Animate loader off screen
+            $(".se-pre-con").fadeOut("slow");
+        });
+    </script>
+</head>
+
+
+<body>
+<div class="se-pre-con"></div>
+    <!-- calendar -->
+    <link href="{% static 'fullcalendar-3.9.0/fullcalendar.min.css' %}" rel='stylesheet' />
+    <link href="{% static 'fullcalendar-3.9.0/fullcalendar.print.min.css' %}" rel='stylesheet' media='print' />
+    <link href="{% static 'fullcalendar-3.9.0/lib/jquery-ui.css' %}" rel='stylesheet' />
+    <link href="{% static 'fullcalendar-scheduler-1.9.3/scheduler.css' %}" rel='stylesheet' />
+
+    <script src="{% static 'fullcalendar-3.9.0/lib/jquery.min.js' %}"></script>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+    <script src="{% static 'fullcalendar-3.9.0/lib/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'fullcalendar-3.9.0/lib/moment.min.js' %}"></script>
+    <script src="{% static 'fullcalendar-3.9.0/fullcalendar.min.js' %}"></script>
+    <script src="{% static 'fullcalendar-scheduler-1.9.3/scheduler.js' %}"></script>
+
+    <!-- Body Inner -->
+    <div class="body-inner">
+
+
+    <!-- Header -->
+    <header id="header" data-transparent="true" class="dark">
+    <div class="header-inner" id="header-inner">
+        <div class="container">
+            <!--Logo-->
+            <div id="logo">
+                <a href={% url 'index' %} class="logo" data-src-dark="{% static 'images/with/with_logo_white.png' %}">
+                    <img src="{% static 'images/with/with_logo_black.png' %}" alt="W.I.T.H Logo">
+                </a>
+            </div>
+            <!--End: Logo-->
+
+            <!-- Search -->
+            <div id="search">
+                <div id="search-logo"><img src="{% static 'images/with/with_logo_white.png' %}" alt="W.I.T.H Logo"></div>
+                <button id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i
+                        class="icon-x"></i></button>
+                <form class="search-form" action="search-results-page.html" method="get">
+                    <input class="form-control" name="q" type="search" placeholder="Search..."
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                    <span class="text-muted">Start typing & press "Enter" or "ESC" to close</span>
+                </form>
+
+                <div class="search-suggestion-wrapper">
+                    <div class="search-suggestion">
+                        <h3>News Articles</h3>
+                        <p><a href="#">Beautiful nature, and rare feathers!</a></p>
+                        <p><a href="#">New costs and rise of the economy!</a></p>
+                        <p><a href="#">A true story, that never been told!</a></p>
+                    </div>
+                    <div class="search-suggestion">
+                        <h3>Looking for these?</h3>
+                        <p><a href="#">New costs and rise of the economy!</a></p>
+                        <p><a href="#">AI can be trusted to take answer calls </a></p>
+                        <p><a href="#">Polo now lets you easily create any beautiful clean website</a></p>
+                    </div>
+                    <div class="search-suggestion">
+                        <h3>Blog Posts</h3>
+                        <p><a href="#">A true story, that never been told!</a></p>
+                        <p><a href="#">Beautiful nature, and rare feathers!</a></p>
+                        <p><a href="#">The most happiest time of the day!</a></p>
+                    </div>
+                </div>
+            </div>
+            <!-- end: search -->
+
+
+            <!--Navigation Resposnive Trigger-->
+            <div id="mainMenu-trigger">
+                <button class="lines-button x"> <span class="lines"></span> </button>
+            </div>
+            <!--end: Navigation Resposnive Trigger-->
+
+            <!--Navigation-->
+            <div id="mainMenu" class="light">
+                <div class="container">
+                    <nav>
+                        <ul>
+                            <li><a href={% url 'index' %}>Home</a></li>
+                            <li><a href={% url 'index' %}#apply_volun>봉사 신청</a></li>
+                            <li><a href={% url 'index' %}#events>위드 캘린더</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!--end: Navigation-->
+        </div>
+    </div>
+    </header>
+    <!-- end: Header -->
+
+
+    {% block page_content %}
+    {% endblock %}
+
+
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="copyright-content">
+            <div class="container">
+                <div class="copyright-text text-center">
+                    <script type="text/javascript">
+                        var date=new Date(),
+                          year = date.getFullYear(),
+                          text = "&copy; " + year + " W.I.T.H - " +
+                              "Made by <a href='https://www.facebook.com/sulynhong' target='_blank' style='color: #00bcd4;'>Lynn Hong</a>. All Rights Reserved.",
+                          html = text;
+                        document.write(html);
+                    </script>
+                </div>
+                <div class="copyright-text text-center">
+                    Based on python Django + uWSGI + Nginx
+                </div>
+
+            </div>
+        </div>
+    </footer>
+    <!-- end: Footer -->
+
+    </div>
+    <!-- end: Body Inner -->
+
+    <!-- Scroll top -->
+<a id="scrollTop"><i class="icon-chevron-up1"></i><i class="icon-chevron-up1"></i></a>
+
+
+
+
+
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+
+ <!--Plugins-->
+ <script src="{% static 'js/plugins.js' %}"></script>
+
+
+<!--Template functions-->
+ <script src="{% static 'js/functions.js' %}"></script>
+
+</body>
+
+</html>
