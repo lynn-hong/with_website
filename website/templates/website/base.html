@@ -16,7 +16,7 @@
     <script src="https://kit.fontawesome.com/f4fde1205d.js"></script>
     <link href="{% static 'css/my.css' %}" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
     <script>
         //paste this code under the head tag or in a separate js file.
         // Wait for window load
@@ -106,8 +106,24 @@
                     <nav>
                         <ul>
                             <li><a href={% url 'index' %}>Home</a></li>
-                            <li><a href={% url 'index' %}#apply_volun>봉사 신청</a></li>
-                            <li><a href={% url 'index' %}#events>위드 캘린더</a></li>
+                            <li><a href={% url 'index' %}#application>봉사 및 행사 신청</a></li>
+                            <!--<li class="dropdown"> <a href={% url 'index' %}#kakao>카톡 알림 신청</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href={% url 'kakao' %}>카톡 인증 및 신청</a></li>
+                                </ul>
+                            </li>-->
+                            <li><a href={% url 'index' %}#events>캘린더</a></li>
+                            <!--<li class="dropdown"> <a href="#">사람들</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">위드 단원</a></li>
+                                    <li><a href="#">도움을 주시는 분들</a></li>
+                                </ul>
+                            </li>-->
+                            <li><a href={% url 'index' %}#faq>
+                                FAQs
+                                <i class="fa fa-exclamation" aria-hidden="true" style="color: skyblue;"></i>
+                                </a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -133,15 +149,27 @@
                         var date=new Date(),
                           year = date.getFullYear(),
                           text = "&copy; " + year + " W.I.T.H - " +
-                              "Made by <a href='https://www.facebook.com/sulynhong' target='_blank' style='color: #00bcd4;'>Lynn Hong</a>. All Rights Reserved.",
+                              "Made by <a class='skyblue' href='https://www.facebook.com/sulynhong' target='_blank'>" +
+                              "Lynn Hong" +
+                              "</a>. All Rights Reserved.",
                           html = text;
                         document.write(html);
                     </script>
                 </div>
                 <div class="copyright-text text-center">
-                    Based on python Django + uWSGI + Nginx
+                    Powered by
+                    <a class='skyblue' href="https://www.djangoproject.com/" target="_blank">
+                        python Django</a> +
+                    <a class='skyblue' href="https://uwsgi-docs.readthedocs.io/en/latest/" target="_blank">
+                        uWSGI</a> +
+                    <a class='skyblue' href="https://nginx.org/en/" target="_blank">
+                        Nginx</a>.
                 </div>
-
+                <div class="text-center tmargin15 font3times">
+                    <a href="https://github.com/lynn-hong/with_website" target="_blank">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>

@@ -27,6 +27,11 @@ APPLICATION_STATUS = (
     (3, '늦참'),
     (4, '일찍가야함'),
 )
+APPLICATION_STATUS_SIMPLE = (
+    (0, '참석'),
+    (1, '미정'),
+    (2, '불참')
+)
 MEMBER_CATEGORY = (
     (0, '위드'),
     (1, '타단체-청년'),
@@ -62,6 +67,17 @@ STAFF_CATEGORY = (
     (5, '나봉 대표봉사자')
 )
 
+FQT_CATEGORY = {
+    (0, 'W.I.T.H 관련 질문들'),
+    (1, '봉사 관련 질문들'),
+    (2, '홈페이지 사용 관련 질문들'),
+}
+
+MISCELLANEOUS_TYPE = {
+    (0, 'FAQ'),
+    (1, 'FAQ_description'),
+}
+
 YEAR_CHOICES = [(r,r) for r in range(1984, datetime.date.today().year+1)]
 
 class Activity(models.Model):
@@ -90,6 +106,11 @@ class Event(models.Model):
     location = models.CharField(_('Location'), max_length=255, blank=True, null=True)
     s_time = models.TimeField(_('Start time'), blank=True, null=True)
     e_time = models.TimeField(_('End time'), blank=True, null=True)
+    is_simple = models.BooleanField(_('약식 신청옵션을 사용할 지 여부'), default=False)
+    num_of_homeless = models.IntegerField(_('노숙인 숫자(새봉만 사용)'), default=0, blank=True, null=True)
+    menu = models.TextField(_('식사 메뉴(새봉만 사용)'), blank=True, null=True, default="")
+    attendee_feedback = models.TextField(_('참석자 피드백&코멘트'), blank=True, null=True, default="")
+    special_issue = models.TextField(_('특이사항&이슈'), blank=True, null=True, default="")
 
     class Meta:
         managed = True
@@ -138,12 +159,27 @@ class Member(AbstractUser):
     class Meta:
         managed = True
         db_table = 'member'
+        unique_together = (('name', 'baptismal_name', 'cellphone'),)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     def __str__(self):
         return '{} {}'.format(self.name, self.baptismal_name)
+
+class Miscellaneous(models.Model):
+    misc_type = models.IntegerField(_('운영용 항목 타입'), choices=MISCELLANEOUS_TYPE, default=0)
+    faq_category = models.IntegerField(_('FAQ 카테고리'), choices=FQT_CATEGORY, default=0)
+    title = models.CharField(_('제목'), max_length=255, blank=True, null=True)
+    body = models.TextField(_('본문'), blank=True, null=True)
+    ordering = models.IntegerField(_('노출 순서'), default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'MISCELLANEOUS'
+
+    def __str__(self):
+        return "{}: {}".format(self.misc_type, self.title)
 
 
 class EventApplication(models.Model):
@@ -157,6 +193,7 @@ class EventApplication(models.Model):
     class Meta:
         managed = True
         db_table = 'EVENT_APPLICATION'
+        unique_together = (('e', 'm'),)
 
     def __str__(self):
         return "[{}] {} - {}".format(self.status, self.e.title, self.m.name)

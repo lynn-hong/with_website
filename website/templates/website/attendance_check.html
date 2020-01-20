@@ -1,0 +1,256 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+    <script>
+        // 인원 추가 submit
+        addAttendeeSubmit = function(){
+            var data = $('#add_attendee_form').serializeArray();
+            $.ajax({
+                type: "POST",
+                url: {% url 'add_attendee' %},
+                data: data,
+                beforeSend: function(){
+                    $('#update_people').html("<img src={% static 'preloader/loader_icon.gif' %} /> 참석자 추가가 진행중입니다!");
+                },
+                success: function(response){ location.replace( window.location.href )},
+            });
+        }
+
+        // 최종 출석체크 submit
+        attendanceCheckSubmit = function(){
+            var data = $('#final_form').serializeArray();
+            $.ajax({
+                type: "POST",
+                url: {% url 'submit_attendance' %},
+                data: data,
+                beforeSend: function(){
+                    $('#final_submit_btn').html("<img src={% static 'preloader/loader_icon.gif' %} /> 출석체크 저장이 진행중입니다!");
+                },
+                success: function(response){ location.reload(); },
+            });
+        }
+    </script>
+
+
+    <section class="p-t-50 p-b-120">
+        <div class="container" style="padding: 0 !important;">
+            <div class="row">
+                <div class="col-lg-12 center">
+                <h1 class="font-weight-800" style="text-align: center;">출석체크</h1>
+                <h2 class="font-weight-800" style="text-align: center;">[{{ event.a.title }}] {{ event.title }}: {{ event.s_date }}</h2>
+                    <div class="col-lg-6 center">
+                        <h4 style="text-align: center;">* <span class="highlight highlight-colored">운영진만 접근해주세요</span></h4>
+                        <h4 style="text-align: center;">* 업데이트 하시면 기록이 남습니다</h4>
+
+                        <form name="final_form" id="final_form">
+                        {% csrf_token %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">이름</th>
+                                    <th scope="col">실제 참석 여부</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ea in event_applications %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ ea.m_name }} {{ ea.m_baptismal_name }}{{ ea.is_guest }}</td>
+                                    <td>
+                                        <label class="p-radio p-radio" style="display: inline-block;">
+                                            <span>참석</span>
+                                            <input type="radio" name={{ ea.m_id }} value=0 {{ ea.attended }}>
+                                            <span class="p-radio-style"></span>
+                                        </label>
+                                        <label class="p-radio p-radio" style="display: inline-block;">
+                                            <span>불참</span>
+                                            <input type="radio" name={{ ea.m_id }} value=2>
+                                            <span class="p-radio-style"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <div class="col-lg-12" id="add_people">
+                            <button type="button" class="btn btn-rounded btn-outline" id="add_people_btn">+ 인원 추가</button>
+                        </div>
+
+                        <hr />
+                        {% if event.a.id == 1 %}
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">노숙인 숫자</span>
+                            </div>
+                            {% if event.num_of_homeless is not none %}
+                                <input type="text" name='num_of_homeless' value={{ event.num_of_homeless }}
+                                       class="form-control" aria-label="the number of homeless people">
+                            {% else %}
+                                <input type="text" name='num_of_homeless'
+                                       class="form-control" aria-label="the number of homeless people">
+                            {% endif %}
+                            <div class="input-group-append">
+                                <span class="input-group-text">명</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">새봉 메뉴</span>
+                            </div>
+                            {% if event.menu is not none %}
+                                <input type="text" name='menu' value="{{ event.menu }}"
+                                       class="form-control" aria-label="menu">
+                            {% else %}
+                                <input type="text" name='menu'
+                                       class="form-control" aria-label="menu">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="attendee_feedback">참석자 피드백&코멘트</label>
+                            <textarea name='attendee_feedback' class="form-control" id="attendee_feedback" rows="3">{% if event.attendee_feedback is not none %}{{ event.attendee_feedback.strip }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issue">특이사항&이슈</label>
+                            <textarea name='special_issue' class="form-control" id="issue" rows="3">{% if event.special_issue is not none %}{{ event.special_issue }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <input type="hidden" id="e_id" name="e_id" value="{{event.id}}">
+                            <button type="button" onclick='attendanceCheckSubmit();' id='final_submit_btn' class="btn btn-rounded btn-block">
+                                출석체크 저장
+                            </button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<script>
+    document.getElementById('header-inner').style.backgroundColor = "#333333";
+
+    // 인원 추가 버튼을 누르면 단원, 게스트 여부를 선택하도록 함
+    $('#add_people_btn').on('click', function() {
+       var txt = "<form name=\"add_attendee_form\" id=\"add_attendee_form\">" +
+           '{% csrf_token %}' +
+           "<div id='add_people_area' style='border: 1px solid lightgray; padding: 5px;'>" +
+           "<button type=\"button\" class=\"btn btn-outline\" id='update_people' onclick='addAttendeeSubmit();'><i class=\"fas fa-save\"></i> Save</button>\n" +
+           "<button type=\"button\" class=\"btn btn-outline\" id='cancel_update_people'><i class=\"far fa-window-close\"></i> Cancel</button>\n" +
+           "<select id=\"category_dropdown\" name=\"cat_id\">\n" +
+              "    <option selected value=\"with\">위드 단원</option>\n" +
+              "    <option value=\"guest\">게스트</option>\n" +
+              "</select>\n" +
+              "<select id=\"member_id_dropdown\" name=\"member_id\">\n" +
+              "    <option disabled selected value>위드 단원: 이름을 선택해주세요</option>\n" +
+              "    <option disabled>────────────</option>\n" +
+              "    {% for member in members %}\n" +
+              "        <option value={{ member.id }}>{{ member.name }} {{ member.baptismal_name }}</option>\n" +
+              "    {% endfor %}\n" +
+              "</select>\n" +
+              "<select id=\"guest_id_dropdown\" name=\"guest_id\" style=\"display:none;\">\n" +
+              "    <option disabled selected value>게스트: 이름을 선택해주세요</option>\n" +
+              "    <option disabled>────────────</option>\n" +
+              "    <option value=\"new\">*** 목록에 이름이 없어요! (신규 봉사자 등록)</option>\n" +
+              "    {% for guest in guests %}\n" +
+              "        {% if guest.recommender != None %}\n" +
+              "            <option value={{ guest.id }}>{{ guest.name }} {{ guest.baptismal_name }} (invited by {{ guest.recommender.name }} {{ guest.recommender.baptismal_name }})</option>\n" +
+              "        {% else %}\n" +
+              "            <option value={{ guest.id }}>{{ guest.name }} {{ guest.baptismal_name }}</option>\n" +
+              "        {% endif %}\n" +
+              "    {% endfor %}\n" +
+              "</select>" +
+              "<div id=\"new_member\" style=\"display:none;\">\n" +
+           "    <hr class=\"tmargin25\" />\n" +
+           "    <h4 class=\"tmargin5 bold\">* 신규 봉사자 등록</h4>\n" +
+           "    <p>처음 1회만 등록하시면 이후부터는 게스트 목록에서 이름을 선택하실 수 있습니다 :)</p>\n" +
+           "    <input type=\"text\" id=\"new_name\" name=\"new_name\"\n" +
+           "           placeholder=\"* 이름\"\n" +
+           "           class=\"bmargin5 width100\">\n" +
+           "    <input type=\"text\" id=\"new_baptismal_name\" name=\"new_baptismal_name\"\n" +
+           "           placeholder=\"* 세례명\"\n" +
+           "           class=\"bmargin5 width100\">\n" +
+           "    <input type=\"tel\" id=\"new_contact\" name=\"new_contact\"\n" +
+           "           class=\"bmargin5 width100\"\n" +
+           "           pattern=\"[0-9]{3}-[0-9]{4}-[0-9]{4}\"\n" +
+           "           placeholder=\"* 연락처(하이픈 없이 숫자만 기입)\">\n" +
+           "    <select id=\"gender_dropdown\" name=\"gender_dropdown\" class=\"bmargin5\">\n" +
+           "        <option disabled selected value>* 성별을 알려주세요!</option>\n" +
+           "        <option disabled>────────────</option>\n" +
+           "        <option value=0>자매님</option>\n" +
+           "        <option value=1>형제님</option>\n" +
+           "    </select>\n" +
+           "    <select id=\"recommender_dropdown\" name=\"recommender_dropdown\">\n" +
+           "        <option disabled selected value>* 누구 소개로 봉사를 신청하시는지 알려주세요!</option>\n" +
+           "        <option disabled>────────────</option>\n" +
+           "        <option value='dont_know'>*** 잘 모르겠어요 ㅜ.ㅜ</option>\n" +
+           "        {% for member in all_members %}\n" +
+           "            <option value={{ member.id }}>{{ member.name }} {{ member.baptismal_name }}</option>\n" +
+           "        {% endfor %}\n" +
+           "    </select>\n" +
+           "    <hr class=\"tmargin25\" />\n" +
+           "</div>" +
+           "</div>" +
+           "<input type=\"hidden\" id=\"e_id\" name=\"e_id\" value=\"{{event.id}}\">" +
+           "</form>" ;
+
+       var parentDiv = document.getElementById("add_people");
+       var has_child = parentDiv.querySelector("#add_people_area") != null;
+       if(has_child === false) {
+           $("#add_people").append(txt);      // Append the new elements
+       }
+    });
+
+    // 위드 단원인지 게스트인지 여부에 따라 드랍다운 메뉴가 달라지도록 함
+    $(document).on('change', '#category_dropdown', function() {
+      if(this.value === "with") {
+        $('#member_id_dropdown').show();
+        $('#guest_id_dropdown').hide();
+        $('#new_member').hide();
+      } else {
+        $('#member_id_dropdown').hide();
+        $('#guest_id_dropdown').show();
+      }
+    });
+
+    // 신규 봉사자인 경우 신규 등록 폼이 함께 뜨도록 함
+    $(document).on('change', '#guest_id_dropdown', function() {
+      if(this.value === "new") {
+        $('#new_member').show();
+      } else {
+        $('#new_member').hide();
+      }
+    });
+
+    // 중복 제출을 막기 위한 jQuery plugin
+    jQuery.fn.preventDoubleSubmission = function() {
+      $(this).on('submit',function(e){
+        var $form = $(this);
+
+        if ($form.data('submitted') === true) {
+          // Previously submitted - don't submit again
+          e.preventDefault();
+        } else {
+          // Mark it so that the next submit can be ignored
+          $form.data('submitted', true);
+        }
+      });
+      // Keep chainability
+      return this;
+    };
+
+    // 취소 버튼을 누르면 추가인원 선택 드랍다운 메뉴가 통째로 삭제되도록 함
+    $(document).on('click', '#cancel_update_people', function() {
+         $('#add_people_area').remove();
+    });
+
+</script>
+
+{% endblock %}

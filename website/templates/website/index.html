@@ -121,6 +121,9 @@
             return true;
         });
 
+        preparing = function() {
+            alert("현재 기능 준비중입니다. 곧 오픈하겠습니다!")
+        }
     </script>
 
 
@@ -171,32 +174,32 @@
     </div>
     <!--end: Inspiro Slider -->
 
-    <!-- 봉사신청 -->
-    <section class="p-t-100 p-b-120" id="apply_volun">
+    <!-- 봉사 및 행사 신청 -->
+    <section class="p-t-100 p-b-120" id="application">
         <div class="container">
             <div class="row">
                 <div class="col-lg-10 center">
                     <div class="heading-text heading-section text-center" data-animate="fadeInUp">
-                        <h4>봉사신청</h4>
+                        <h4>봉사 및 행사 신청</h4>
                         <h2>나는 네가 한 일을, <br/>너의 사랑과 믿음과 봉사와 인내를 안다.</h2>
-                        <p class="lead">현재 온라인으로는 새벽봉사만 신청 받습니다. 은봉&나봉은 대표봉사자에게 별도 문의 부탁드립니다!</p>
+                        <p class="lead">현재 온라인으로는 나눔의 집 봉사는 신청받지 않습니다. 나봉은 대표봉사자에게 별도 문의 부탁드립니다!</p>
                         <p class="lead">처음 오시는 게스트 분들도 신청 가능합니다!</p>
-                        <a class="btn btn-default btn-lg" data-target="#modal-3" data-toggle="modal" href="#">봉사 신청</a>
+                        <a class="btn btn-default btn-lg" data-target="#modal-3" data-toggle="modal" href="#">참석 신청하러 가기</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <!-- end: 봉사신청 -->
+    <!-- end: 봉사 및 행사 신청 -->
 
 
-    <!-- 봉사신청 modal -->
+    <!-- 봉사 및 행사 신청 modal -->
     <div class="modal fade" id="modal-3" tabindex="-1" role="modal" aria-labelledby="modal-label-3"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modal-label-3" class="modal-title">위드 봉사신청</h3>
+                    <h3 id="modal-label-3" class="modal-title">봉사 및 행사 신청</h3>
                     <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
                 </div>
                 <div class="modal-body">
@@ -267,11 +270,17 @@
                                     <hr class="tmargin25" />
                                 </div>
                                 {% for app_event in app_events %}
-                                <h4 class="tmargin25">{{ app_event.a.title }} {{ app_event.title }} ({{ app_event.s_date|date:"m/d" }})</h4>
+                                <h4 class="tmargin25">[{{ app_event.a.title }}] {{ app_event.title }} ({{ app_event.s_date|date:"m/d" }})</h4>
                                     <select id="application_id_dropdown-{{app_event.id}}" name="app_id-{{app_event.id}}">
-                                    {% for app_choice in app_choices %}
-                                        <option value={{ app_choice.value }}>{{ app_choice.name }}</option>
-                                    {% endfor %}
+                                    {% if app_event.is_simple %}
+                                        {% for app_choice in app_choices_simple %}
+                                            <option value={{ app_choice.value }}>{{ app_choice.name }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for app_choice in app_choices %}
+                                            <option value={{ app_choice.value }}>{{ app_choice.name }}</option>
+                                        {% endfor %}
+                                    {% endif %}
                                     </select>
                                 {% endfor %}
                             </form>
@@ -287,64 +296,34 @@
     <!-- end: 봉사신청 modal -->
 
 
-    <!-- 카톡 알림신청 -->
-    <section class="parallax background-overlay-dark p-t-200 p-b-200"
-             style="background-image:url(homepages/corporate-v7/images/parallax/4.jpg);">
+
+    <!-- 카톡 알림신청(call-to-action border) -->
+    <section id="kakao"
+             class="background-overlay-dark p-t-50 p-b-50">
         <div class="container xs-text-center sm-text-center text-light">
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="heading-text heading-section">
-                        <h2>카카오톡 알림 신청<img src="{% static 'icon/me_appicon_en.png' %}" /></h2>
-                        <p class="lead">
-                            신청하신 일정의 D-1 리마인드, 자신의 월간 봉사 신청 현황 등을 카카오톡으로 받아보실 수 있어요!
-                        </p>
-                        <p>
-                            최초 1회 인증이 필요합니다. 자세히 알아보시려면 아래 버튼을 눌러주세요.
-                        </p>
-                    </div>
-                    <a href="#services" class="btn btn-light btn-outline btn-rounded">카톡 인증하러 가기</a>
+            <div class="row call-to-action">
+                <div class="col-lg-9">
+                    <h3>
+                        <img src="{% static 'icon/me_appicon_en.png' %}" style="height: 1.2em;"/>
+                        카카오톡 알림 신청 (봉사 알리미) : 준비중
+                    </h3>
+                    <p>
+                        신청하신 일정의 D-1 리마인드, 자신의 월간 봉사 신청 현황 등을 카카오톡으로 받아보실 수 있어요!
+                    </p>
+                    <p>
+                        최초 1회 인증이 필요합니다. 자세히 알아보시려면 '카톡 인증' 버튼을 눌러주세요.
+                    </p>
                 </div>
-
-
-                <div class="col-lg-7">
-<div class="row">
-                    <div class="col-lg-6">
-                        <div class="text-center">
-                            <div class="counter text-lg"> <span data-speed="3000" data-refresh-interval="50" data-to="12416" data-from="600" data-seperator="true"></span> </div>
-                            <div class="seperator seperator-small"></div>
-                            <p>LINES OF CODE</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="text-center">
-                            <div class="counter text-lg"> <span data-speed="4500" data-refresh-interval="23" data-to="365" data-from="100" data-seperator="true"></span> </div>
-                            <div class="seperator seperator-small"></div>
-                            <p>CUPS OF COFFEE</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="text-center">
-                            <div class="counter text-lg"> <span data-speed="3000" data-refresh-interval="12" data-to="114" data-from="50" data-seperator="true"></span> </div>
-                            <div class="seperator seperator-small"></div>
-                            <p>FINISHED PROJECTS</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-
-                        <div class="text-center">
-                            <div class="counter text-lg"> <span data-speed="4550" data-refresh-interval="50" data-to="14825" data-from="48" data-seperator="true"></span> </div>
-                            <div class="seperator seperator-small"></div>
-                            <p>SATISFIED CLIENTS</p>
-                        </div>
-                    </div>
-                </div></div>
+                <div class="col-lg-3">
+                    <a class="btn btn-light" onClick="preparing();">카톡 인증하러 가기</a>
+                </div>
             </div>
         </div>
     </section>
      <!-- end: 카톡 알림신청 -->
 
 
-    <!-- 봉사신청 현황 -->
+    <!-- 봉사 및 행사 신청 현황 -->
     <section id="events" class="p-t-50 p-b-120" style="border-top: 1px #e9e9e9 solid;">
         <div class="container" style="padding: 0 !important;">
             <div class="row">
@@ -359,7 +338,7 @@
             </div>
         </div>
     </section>
-    <!-- end: 봉사신청 현황 -->
+    <!-- end: 봉사 및 행사 신청 현황 -->
 
 
     <!-- 가이드라인 다운로드 링크 -->
@@ -430,6 +409,37 @@
         </div>
     </section>
     <!-- end: 가이드라인 다운로드 링크 -->
+
+
+    <!-- FAQ -->
+    <section id="faq">
+        <div class="container">
+                <div class="heading-text heading-section text-center">
+                    <h2>FAQs</h2>
+                </div>
+            <div class="row">
+                {% for faq in faqs %}
+                <div class="col-lg-6 tmargin15">
+                    <h3>{{ faq.title }} <small>({{ faq.faqs|length }})</small></h3>
+                    <p>{{ faq.meaning }}</p>
+                    <div class="accordion toggle fancy radius clean">
+                        {% for f in faq.faqs %}
+                        <div class="ac-item">
+                            <h5 class="ac-title"><i class="fa fa-question-circle"></i>
+                                {{ f.title }}
+                            </h5>
+                            <div style="" class="ac-content">
+                                {{ f.body|linebreaksbr }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- end: FAQ -->
 
 
     <!-- 생축일 modal -->
