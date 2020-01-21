@@ -4,11 +4,11 @@ import uuid
 
 from django.views.generic import TemplateView
 from django.shortcuts import render
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count, F, Q
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
+from django.core.serializers.json import DjangoJSONEncoder
 
 from .models import Event, EventApplication, Member, Miscellaneous, APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY
 
@@ -32,6 +32,7 @@ class Index(TemplateView):
                 {'name': a.m.name, 'status': a.get_status_display()}
             )
         return returned_applications
+
 
     def get_event(self):
         event_arr = []
@@ -76,6 +77,7 @@ class Index(TemplateView):
                                          'color': 'skyblue'})
         return event_arr, special_days_arr
 
+
     # 신청, 미정, 불참 등 choice 가져오기
     def get_app_choices(self, is_simple=False):
         return_list = list()
@@ -87,13 +89,20 @@ class Index(TemplateView):
                 return_list.append({'name': item[1], 'value': item[0]})
         return return_list
 
+
     # 이미 신청한 사람들 목록을 체크해서 이 사람들은 목록에 뜨지 않도록 함
-    def get_already_applied_member(self, app_events):
-        app_event_ids = [app_event.id for app_event in app_events]
-        app_applications = EventApplication.objects.filter(e__id__in=app_event_ids).all()
-        applicants = app_applications.values('m').annotate(count=Count('m'), member=F('m__id')).values(
-            'count', 'member')
-        full_applied = [a['member'] for a in applicants if a['count'] >= len(app_event_ids)]
+    # TODO: 추후 with&guest 여부 dropdown을 선택하면 그때 interactive하게 요청 보내서 목록 받아오는 방식으로 변경 필요
+    # TODO: 지금은 단원 신청 시에도 게스트까지 목록을 받아오도록 되어 있어 시간이 2배로 소요됨
+    def get_already_applied_member(self):
+        full_applied = list()
+        for member in Member.objects.all().order_by('id'):
+            activity_category = check_event_able_to_apply(member.id, member.category,
+                                                          member_status=member.member_status, baptismal_name=member.baptismal_name)
+            event_ids = [event.id for event in fetch_events_by_condition(activity_category)]
+            already_applied_events = EventApplication.objects.filter(e__id__in=event_ids).filter(m__id=member.id).all()
+            if len(event_ids) == len(already_applied_events):
+                full_applied.append(member.id)
+        print(full_applied)
         return full_applied
 
     def get_faqs(self):
@@ -113,11 +122,9 @@ class Index(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
         context['events'], context['special_days'] = self.get_event()
-        context['app_events'] = Event.objects.all().filter(a__title__in=['새봉', '은봉', '정기회합', '위드X빈첸시오',
-                                                                         '위드행사', '청년사목회 행사', '미사 관련 봉사'])\
-            .filter(Q(s_date=datetime.now().date(), s_time__gte=datetime.now().time())|Q(s_date__gt=datetime.now().date()))\
-            .order_by('s_date')
-        already_applied = self.get_already_applied_member(context['app_events'])
+        activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사']
+        context['app_events'] = fetch_events_by_condition(activity_category)
+        already_applied = self.get_already_applied_member()
         context['members'] = Member.objects.all().filter(category=0).exclude(member_status=2).exclude(id__in=already_applied).order_by('name')  # 위드(탈단원 제외)
         context['guests'] = Member.objects.all().filter(category__in=[1, 3]) | Member.objects.all().filter(category=0).filter(member_status=2) # 타단체청년, 게스트 or 위드에서 탈단원
         context['guests'] = context['guests'].exclude(id__in=already_applied).order_by(
@@ -127,6 +134,82 @@ class Index(TemplateView):
         context['app_choices_simple'] = self.get_app_choices(is_simple=True)
         context['faqs'] = self.get_faqs()
         return context
+
+
+def fetch_events_by_condition(activity_category):
+    events = Event.objects.all().filter(a__title__in=activity_category) \
+        .filter(Q(s_date=datetime.now().date(), s_time__gte=datetime.now().time()) | Q(
+        s_date__gt=datetime.now().date())) \
+        .order_by('s_date')
+    return events
+
+def check_event_able_to_apply(member_id, member_category, member_status=None, baptismal_name=None):
+    if member_id == 'new':
+        activity_category = ['새봉']  # 처음 오는 게스트는 새봉만 신청 가능
+    else:
+        if member_status is None and baptismal_name is None:
+            member_info = Member.objects.values('member_status', 'baptismal_name').filter(id=member_id)
+            if int(member_category) == 1:  # 위드 단원
+                is_catholic = False if list(member_info)[0]['member_status'] == 4 else True  # 4 is 비신자단원
+            else:
+                is_catholic = False if list(member_info)[0]['baptismal_name'] is None else True  # None is 비신자게스트
+        else:
+            if int(member_category) == 1:  # 위드 단원
+                is_catholic = False if member_status == 4 else True  # 4 is 비신자단원
+            else:
+                is_catholic = False if baptismal_name is None else True  # None is 비신자게스트
+
+        if int(member_category) == 1:  # 위드 단원
+            if is_catholic:
+                activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사']
+            else:
+                activity_category = ['새봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사']
+        else:  # 게스트
+            if is_catholic:
+                activity_category = ['새봉', '은봉']
+            else:
+                activity_category = ['새봉']
+    return activity_category
+
+
+def filter_events_by_member(member_id, member_category):
+    activity_category = check_event_able_to_apply(member_id, member_category)
+    events = Event.objects.all().filter(a__title__in=activity_category) \
+        .filter(
+        Q(s_date=datetime.now().date(), s_time__gte=datetime.now().time()) | Q(s_date__gt=datetime.now().date())) \
+        .order_by('s_date')
+    if member_id == 'new':
+        event_applications = []
+    else:
+        event_applications = EventApplication.objects.all().filter(m__id=member_id).filter(
+            Q(e__s_date=datetime.now().date(), e__s_time__gte=datetime.now().time()) | Q(e__s_date__gt=datetime.now().date())) \
+            .order_by('e__s_date')
+    applied_event_id = []
+    for event_application in event_applications:
+        applied_event_id.append(event_application.e.id)
+    not_applied_events = []
+    for event in events:
+        each_dict = dict()
+        if event.id not in applied_event_id:
+            each_dict['id'] = event.id
+            each_dict['title'] = event.title
+            each_dict['a_title'] = event.a.title
+            each_dict['s_date'] = event.s_date
+            each_dict['is_simple'] = event.is_simple
+            each_dict['desc'] = event.desc
+            each_dict['s_time'] = event.s_time if event.s_time is not None else event.a.s_time
+            each_dict['e_time'] = event.e_time if event.e_time is not None else event.a.e_time
+            not_applied_events.append(each_dict)
+    return sorted(not_applied_events, key=lambda i: (i['s_date'], i['s_time']), reverse=True)
+
+
+# 봉사&행사 신청 시 멤버를 선택하면 그에 따라 맞춤형으로 아직 신청하지 않은 것만 뜨게 됨
+def get_events(request):
+    member_id = request.GET.get('member_id', None)
+    member_category = request.GET.get('member_category', None)
+    app_events_by_member = filter_events_by_member(member_id, member_category)
+    return HttpResponse(json.dumps(app_events_by_member, sort_keys=True, indent=1, cls=DjangoJSONEncoder),
+                        content_type='application/json; charset=utf-8')
 
 
 class IndexAttendanceCheck(TemplateView):
@@ -169,6 +252,9 @@ class IndexAttendanceCheck(TemplateView):
         if len(context['event']) > 0:
             context['event'] = context['event'][0]
         return context
+
+
+
 
 
 class HaltException(Exception):
