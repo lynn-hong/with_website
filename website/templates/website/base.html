@@ -53,15 +53,17 @@
         <div class="container">
             <!--Logo-->
             <div id="logo">
-                <a href={% url 'index' %} class="logo" data-src-dark="{% static 'images/with/with_logo_white.png' %}">
-                    <img src="{% static 'images/with/with_logo_black.png' %}" alt="W.I.T.H Logo">
+                <a href={% url 'index' %} class="logo" data-src-dark="{% static 'images/with/plain_vertical_white_100h.png' %}">
+                    <img src="{% static 'images/with/plain_vertical_black_100h.png' %}"
+                         style="vertical-align: middle; width: 220px; height: auto;"
+                         alt="W.I.T.H Logo">
                 </a>
             </div>
             <!--End: Logo-->
 
             <!-- Search -->
             <div id="search">
-                <div id="search-logo"><img src="{% static 'images/with/with_logo_white.png' %}" alt="W.I.T.H Logo"></div>
+                <div id="search-logo"><img src="{% static 'images/with/plain_vertical_white_100h.png' %}" alt="W.I.T.H Logo"></div>
                 <button id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i
                         class="icon-x"></i></button>
                 <form class="search-form" action="search-results-page.html" method="get">
