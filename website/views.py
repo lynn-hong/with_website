@@ -102,7 +102,6 @@ class Index(TemplateView):
             already_applied_events = EventApplication.objects.filter(e__id__in=event_ids).filter(m__id=member.id).all()
             if len(event_ids) == len(already_applied_events):
                 full_applied.append(member.id)
-        print(full_applied)
         return full_applied
 
     def get_faqs(self):
@@ -152,13 +151,12 @@ def check_event_able_to_apply(member_id, member_category, member_status=None, ba
             if int(member_category) == 1:  # 위드 단원
                 is_catholic = False if list(member_info)[0]['member_status'] == 4 else True  # 4 is 비신자단원
             else:
-                is_catholic = False if list(member_info)[0]['baptismal_name'] is None else True  # None is 비신자게스트
+                is_catholic = False if list(member_info)[0]['baptismal_name'] in ['', None] else True  # None is 비신자게스트
         else:
             if int(member_category) == 1:  # 위드 단원
                 is_catholic = False if member_status == 4 else True  # 4 is 비신자단원
             else:
-                is_catholic = False if baptismal_name is None else True  # None is 비신자게스트
-
+                is_catholic = False if baptismal_name in ['', None] else True  # None is 비신자게스트
         if int(member_category) == 1:  # 위드 단원
             if is_catholic:
                 activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사']
