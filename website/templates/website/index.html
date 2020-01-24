@@ -612,6 +612,9 @@
             events_div.empty();
             for (var i = result.length - 1; i >= 0; i--) {
                 events_div.append('<h4 class="tmargin25">[' + result[i].a_title + '] ' + result[i].title + ' (' + result[i].s_date + ')</h4>');
+                if (result[i].alert !== null) {
+                    events_div.append('<p style="color: ' + result[i].alert_color + ';">* ' + result[i].alert + '</p>');
+                }
                 events_div.append('<select id="application_id_dropdown-' + result[i].id + '\" name=\"app_id-' + result[i].id + '\">)');
                 var target_dropdown = $("select#application_id_dropdown-" + result[i].id);
                 if (result[i].is_simple == true) {

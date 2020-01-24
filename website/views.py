@@ -186,6 +186,8 @@ def filter_events_by_member(member_id, member_category):
     for event_application in event_applications:
         applied_event_id.append(event_application.e.id)
     not_applied_events = []
+    event_cnt_list = EventApplication.objects.exclude(e__id__in=applied_event_id).filter(status__in=[0, 3, 4]).values('m__id').\
+        annotate(count=Count('e__id')).values('e__id', 'count')
     for event in events:
         each_dict = dict()
         if event.id not in applied_event_id:
@@ -197,6 +199,15 @@ def filter_events_by_member(member_id, member_category):
             each_dict['desc'] = event.desc
             each_dict['s_time'] = event.s_time if event.s_time is not None else event.a.s_time
             each_dict['e_time'] = event.e_time if event.e_time is not None else event.a.e_time
+            register_cnt = len(event_cnt_list.filter(e__id=event.id))
+            each_dict['alert'] = None
+            if event.a.act_type == 0:
+                if register_cnt > event.a.max_people:
+                    each_dict['alert'] = '봉사자가 너무 많아요! 다른 날은 어떠세요?'
+                    each_dict['alert_color'] = 'blue'
+                elif register_cnt < event.a.min_people:
+                    each_dict['alert'] = '봉사자가 부족해요ㅜㅜ 시간 혹시 안되시나요?'
+                    each_dict['alert_color'] = 'red'
             not_applied_events.append(each_dict)
     return sorted(not_applied_events, key=lambda i: (i['s_date'], i['s_time']), reverse=True)
 
@@ -250,9 +261,6 @@ class IndexAttendanceCheck(TemplateView):
         if len(context['event']) > 0:
             context['event'] = context['event'][0]
         return context
-
-
-
 
 
 class HaltException(Exception):
