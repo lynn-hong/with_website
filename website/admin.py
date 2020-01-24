@@ -10,7 +10,7 @@ textinput_width = '100'
 
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'act_type', 'day', 'title', 'desc', 'location', 's_time', 'e_time']
+    list_display = ['id', 'act_type', 'day', 'title', 'desc', 'location', 's_time', 'e_time', 'min_people', 'max_people']
     list_display_links = ['title']
     list_filter = ['act_type']
     search_fields = ['title', 'desc']

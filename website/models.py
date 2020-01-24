@@ -89,6 +89,8 @@ class Activity(models.Model):
     location = models.CharField(_('Location'), max_length=255, blank=True, null=True)
     s_time = models.TimeField(_('Start'), blank=True, null=True)
     e_time = models.TimeField(_('End'), blank=True, null=True)
+    min_people = models.IntegerField(_('최소 인원'), default=0, blank=True, null=True)
+    max_people = models.IntegerField(_('최대 인원'), default=10000, blank=True, null=True)
 
     class Meta:
         managed = True
