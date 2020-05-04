@@ -55,7 +55,7 @@ class UserAdmin(DjangoUserAdmin):
         }),
     )
     list_display = ('email', 'name', 'baptismal_name', 'member_status', 'is_kakao_registered','gender', 'category', 'is_staff', 'affiliation', 'date_joined')
-    search_fields = ('email', 'kakao_email', 'name', 'affiliation')
+    search_fields = ('email', 'kakao_email', 'name', 'baptismal_name', 'affiliation')
     list_filter = ['category', 'is_staff', 'member_status']
     ordering = ('name',)
 
