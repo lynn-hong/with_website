@@ -18,7 +18,7 @@ class Index(TemplateView):
 
     def get_event_applications(self, e_id):
         # 실참하지 않은 사람들은 띄워주지 않음
-        applications = EventApplication.objects.filter(e__id=e_id).filter(attendance=True).all().\
+        applications = EventApplication.objects.filter(e__id=e_id).exclude(status=2).filter(attendance=True).all().\
             order_by('-m__is_staff', 'm__category', 'm__name')
         returned_applications = list()
         for a in applications:
@@ -35,8 +35,10 @@ class Index(TemplateView):
 
 
     def get_event(self):
+        print(datetime.now())
         event_arr = []
         all_events = Event.objects.all()
+        print(datetime.now())
         for e in all_events:
             event_sub_arr = {}
             applications = self.get_event_applications(e_id=e.id)
@@ -121,7 +123,7 @@ class Index(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
         context['events'], context['special_days'] = self.get_event()
-        activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사']
+        activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사', '외부봉사', '청소봉사']
         context['app_events'] = fetch_events_by_condition(activity_category)
         already_applied = self.get_already_applied_member()
         context['members'] = Member.objects.all().filter(category=0).exclude(member_status=2).exclude(id__in=already_applied).order_by('name')  # 위드(탈단원 제외)
@@ -159,14 +161,15 @@ def check_event_able_to_apply(member_id, member_category, member_status=None, ba
                 is_catholic = False if baptismal_name in ['', None] else True  # None is 비신자게스트
         if int(member_category) == 1:  # 위드 단원
             if is_catholic:
-                activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사']
+                activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사',
+                                     '외부봉사', '청소봉사']
             else:
-                activity_category = ['새봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사']
+                activity_category = ['새봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '청소봉사']
         else:  # 게스트
             if is_catholic:
-                activity_category = ['새봉', '은봉']
+                activity_category = ['새봉', '은봉', '청소봉사', '외부봉사']
             else:
-                activity_category = ['새봉']
+                activity_category = ['새봉', '청소봉사']
     return activity_category
 
 
@@ -201,7 +204,7 @@ def filter_events_by_member(member_id, member_category):
             each_dict['e_time'] = event.e_time if event.e_time is not None else event.a.e_time
             register_cnt = len(event_cnt_list.filter(e__id=event.id))
             each_dict['alert'] = None
-            if event.a.act_type == 0:
+            if event.a.act_type in [0, 2]:
                 if register_cnt > event.a.max_people:
                     each_dict['alert'] = '봉사자가 너무 많아요! 다른 날은 어떠세요?'
                     each_dict['alert_color'] = 'blue'
