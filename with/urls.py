@@ -8,5 +8,3 @@ urlpatterns = [
     url(r'', include('website.urls')),
     url(r'^kakao/', include('kakao.urls')),
 ]
-
-handler404 = 'website.views.not_found'

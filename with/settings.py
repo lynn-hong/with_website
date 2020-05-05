@@ -30,7 +30,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&rs5@f-tdsv%=emdyvpfa%#iq8179yi^#ker@fs&hwe912bw8n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -122,3 +122,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'website', 'static')
 MEDIA_URL = '/static/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website', 'static', 'images')
 JET_SIDE_MENU_COMPACT  =  True
+
