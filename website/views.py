@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, time, date
 import uuid
+import collections
 
 from django.views.generic import TemplateView
 from django.shortcuts import render
@@ -10,75 +11,12 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
 from django.core.serializers.json import DjangoJSONEncoder
 
-from .models import Event, EventApplication, Member, Miscellaneous, APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY
+from .models import Event, EventApplication, Member, Miscellaneous, Staff, \
+    APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY
 
 
 class Index(TemplateView):
     template_name = 'website/index.html'
-
-    def get_event_applications(self, e_id):
-        # 실참하지 않은 사람들은 띄워주지 않음
-        applications = EventApplication.objects.filter(e__id=e_id).exclude(status=2).filter(attendance=True).all().\
-            order_by('-m__is_staff', 'm__category', 'm__name')
-        returned_applications = list()
-        for a in applications:
-            if a.m.baptismal_name is not None:
-                a.m.name = "{} {}".format(a.m.name, a.m.baptismal_name)
-            if a.m.get_category_display() != '위드':
-                a.m.name = "(게스트) {}".format(a.m.name)
-                if a.m.recommender is not None:
-                    a.m.name = a.m.name + " (invited by {} {})".format(a.m.recommender.name, a.m.recommender.baptismal_name)
-            returned_applications.append(
-                {'name': a.m.name, 'status': a.get_status_display()}
-            )
-        return returned_applications
-
-
-    def get_event(self):
-        print(datetime.now())
-        event_arr = []
-        all_events = Event.objects.all()
-        print(datetime.now())
-        for e in all_events:
-            event_sub_arr = {}
-            applications = self.get_event_applications(e_id=e.id)
-            event_sub_arr['title'] = "[{}] {}".format(e.a.title, e.title)
-            event_sub_arr['desc'] = e.desc.replace("\n", "<br />")
-            if e.s_time is not None:
-                start_time = time.strftime(e.s_time, "%H:%M:%S")
-            else:
-                start_time = time.strftime(e.a.s_time, "%H:%M:%S")
-            if e.e_time is not None:
-                end_time = time.strftime(e.e_time, "%H:%M:%S")
-            else:
-                end_time = time.strftime(e.a.e_time, "%H:%M:%S")
-            if e.location is None:
-                e.location = e.a.location
-            start_datetime = "{} {}".format(datetime.strftime(e.s_date, "%Y-%m-%d"), start_time)
-            if e.e_date is not None:
-                end_datetime = "{} {}".format(datetime.strftime(e.e_date, "%Y-%m-%d"), end_time)
-            else:
-                end_datetime = "{} {}".format(datetime.strftime(e.s_date, "%Y-%m-%d"), end_time)
-            event_sub_arr['location'] = e.location
-            event_sub_arr['start'] = start_datetime
-            event_sub_arr['end'] = end_datetime
-            event_sub_arr['applications'] = json.dumps(applications, cls=DjangoJSONEncoder)
-            event_arr.append(event_sub_arr)
-        special_days_arr = []
-        for d in Member.objects.filter(category=0).exclude(member_status=2).values('name', 'baptismal_name', 'birthday', 'feast_day', 'gender'):
-            gender_desc = "자매님" if d['gender'] == 0 else "형제님"
-            if d['birthday'] is not None:
-                special_days_arr.append({'title': "[생일] {} {}".format(d['name'], d['baptismal_name']),
-                                         'start': str(date.today().year) + '-' + d['birthday'].strftime('%m-%d'),
-                                         'desc': "{} {} {}의 생일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
-                                         'color': 'pink'})
-            if d['feast_day'] is not None:
-                special_days_arr.append({'title': "[축일] {} {}".format(d['name'], d['baptismal_name']),
-                                         'start': str(date.today().year) + '-' + d['feast_day'].strftime('%m-%d'),
-                                         'desc': "{} {} {}의 축일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
-                                         'color': 'skyblue'})
-        return event_arr, special_days_arr
-
 
     # 신청, 미정, 불참 등 choice 가져오기
     def get_app_choices(self, is_simple=False):
@@ -122,7 +60,7 @@ class Index(TemplateView):
     # 실제 index에 들어가는 context들 만들기
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
-        context['events'], context['special_days'] = self.get_event()
+        #context['events'], context['special_days'] = self.get_event()
         activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사', '외부봉사', '청소봉사']
         context['app_events'] = fetch_events_by_condition(activity_category)
         already_applied = self.get_already_applied_member()
@@ -171,7 +109,6 @@ def check_event_able_to_apply(member_id, member_category, member_status=None, ba
             else:
                 activity_category = ['새봉', '청소봉사']
     return activity_category
-
 
 def filter_events_by_member(member_id, member_category):
     activity_category = check_event_able_to_apply(member_id, member_category)
@@ -371,7 +308,95 @@ def submit_attendance(request):
                                                                       "special_issue": request.POST['special_issue']})
     return HttpResponseRedirect(reverse_lazy('index'))
 
+
 def thankyou(request):
     return render(request, 'website/thankyou_application.html')
 
 
+class IndexCalendar(TemplateView):
+
+    template_name = 'website/calendar.html'
+
+    def get_event_applications(self, e_id):
+        # 실참하지 않은 사람들은 띄워주지 않음
+        applications = EventApplication.objects.filter(e__id=e_id).exclude(status=2).filter(attendance=True).all().\
+            order_by('-m__is_staff', 'm__category', 'm__name')
+        returned_applications = list()
+        for a in applications:
+            if a.m.baptismal_name is not None:
+                a.m.name = "{} {}".format(a.m.name, a.m.baptismal_name)
+            if a.m.get_category_display() != '위드':
+                a.m.name = "(게스트) {}".format(a.m.name)
+                if a.m.recommender is not None:
+                    a.m.name = a.m.name + " (invited by {} {})".format(a.m.recommender.name, a.m.recommender.baptismal_name)
+            returned_applications.append(
+                {'name': a.m.name, 'status': a.get_status_display()}
+            )
+        return returned_applications
+
+    def get_event(self):
+        event_arr = []
+        all_events = Event.objects.all()
+        for e in all_events:
+            event_sub_arr = {}
+            applications = self.get_event_applications(e_id=e.id)
+            event_sub_arr['title'] = "[{}] {}".format(e.a.title, e.title)
+            event_sub_arr['desc'] = e.desc.replace("\n", "<br />")
+            if e.s_time is not None:
+                start_time = time.strftime(e.s_time, "%H:%M:%S")
+            else:
+                start_time = time.strftime(e.a.s_time, "%H:%M:%S")
+            if e.e_time is not None:
+                end_time = time.strftime(e.e_time, "%H:%M:%S")
+            else:
+                end_time = time.strftime(e.a.e_time, "%H:%M:%S")
+            if e.location is None:
+                e.location = e.a.location
+            start_datetime = "{} {}".format(datetime.strftime(e.s_date, "%Y-%m-%d"), start_time)
+            if e.e_date is not None:
+                end_datetime = "{} {}".format(datetime.strftime(e.e_date, "%Y-%m-%d"), end_time)
+            else:
+                end_datetime = "{} {}".format(datetime.strftime(e.s_date, "%Y-%m-%d"), end_time)
+            event_sub_arr['location'] = e.location
+            event_sub_arr['start'] = start_datetime
+            event_sub_arr['end'] = end_datetime
+            event_sub_arr['applications'] = json.dumps(applications, cls=DjangoJSONEncoder)
+            event_arr.append(event_sub_arr)
+        special_days_arr = []
+        for d in Member.objects.filter(category=0).exclude(member_status=2).values('name', 'baptismal_name', 'birthday', 'feast_day', 'gender'):
+            gender_desc = "자매님" if d['gender'] == 0 else "형제님"
+            if d['birthday'] is not None:
+                special_days_arr.append({'title': "[생일] {} {}".format(d['name'], d['baptismal_name']),
+                                         'start': str(date.today().year) + '-' + d['birthday'].strftime('%m-%d'),
+                                         'desc': "{} {} {}의 생일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
+                                         'color': 'pink'})
+            if d['feast_day'] is not None:
+                special_days_arr.append({'title': "[축일] {} {}".format(d['name'], d['baptismal_name']),
+                                         'start': str(date.today().year) + '-' + d['feast_day'].strftime('%m-%d'),
+                                         'desc': "{} {} {}의 축일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
+                                         'color': 'skyblue'})
+        return event_arr, special_days_arr
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexCalendar, self).get_context_data(**kwargs)
+        context['events'], context['special_days'] = self.get_event()
+        return context
+
+
+class IndexManager(TemplateView):
+
+    template_name = 'website/managers.html'
+
+    def get_staff_by_year(self):
+        return_dict = collections.OrderedDict()
+        for s in Staff.objects.all().order_by('-staff_year', 'staff_category', '-staff_status'):
+            if s.staff_year not in return_dict:
+                return_dict[s.staff_year] = [s]
+            else:
+                return_dict[s.staff_year].append(s)
+        return return_dict
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexManager, self).get_context_data(**kwargs)
+        context['staff_years'] = self.get_staff_by_year()
+        return context

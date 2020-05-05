@@ -1,0 +1,70 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+    <section id="page-title">
+        <div class="container">
+            <div class="page-title">
+                <h2>역대 운영진 목록</h2>
+                <span>운영진이 확인되는 시점부터 현재까지. </span>
+                <span>이전 운영진들 정보 또는 틀린 내용은 제보 부탁드립니다.</span>
+            </div>
+        </div>
+    </section>
+
+    <!--Team members shadow-->
+    {% for staff_year, managers in staff_years.items %}
+        <section class="p-t-40 p-b-20" style="{% cycle '' 'background-color: #e6e6e6;' %}">
+            <div class="container" style="padding: 0 !important;">
+                <div class="heading-text heading-line text-center"><h3>{{ staff_year }}</h3> </div>
+                <div class="row team-members team-members-shadow m-b-40" data-arrows="false" data-margin="20" data-items="5">
+                    {% for manager in managers %}
+                    <div class="col-lg-3">
+                        <div class="team-member">
+                            <!--<div class="team-image">
+                                <img src="images/team/6.jpg">
+                            </div>-->
+                            <div class="team-desc">
+                                {% if manager.staff_status == 0 %}
+                                    <h3>{{ manager.m.name }} {{ manager.m.baptismal_name }}</h3>
+                                {% else %}
+                                    <h3>{{ manager.m.name }} {{ manager.m.baptismal_name }} (사임)</h3>
+                                {% endif %}
+                                <span>{{ manager.get_staff_category_display }}</span>
+                                <!--<p>Lorem ipsum dolor sit amet, consectetur adipiscing tristique hendrerit laoreet. </p>
+                                <div class="align-center">
+                                    <a class="btn btn-xs btn-slide btn-light" href="#">
+                                        <i class="fab fa-facebook-f"></i>
+                                        <span>Facebook</span>
+                                    </a>
+                                    <a class="btn btn-xs btn-slide btn-light" href="#" data-width="100">
+                                        <i class="fab fa-twitter"></i>
+                                        <span>Twitter</span>
+                                    </a>
+                                    <a class="btn btn-xs btn-slide btn-light" href="#" data-width="118">
+                                        <i class="fab fa-instagram"></i>
+                                        <span>Instagram</span>
+                                    </a>
+                                    <a class="btn btn-xs btn-slide btn-light" href="mailto:#" data-width="80">
+                                        <i class="far fa-envelope"></i>
+                                        <span>Mail</span>
+                                    </a>
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endfor %}
+    <!--END: Team members shadow-->
+
+
+<script>
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+{% endblock %}

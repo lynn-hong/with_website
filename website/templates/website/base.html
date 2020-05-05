@@ -54,7 +54,8 @@
             <!--Logo-->
             <div id="logo">
                 <a href={% url 'index' %} class="logo" data-src-dark="{% static 'images/with/plain_vertical_white_100h.png' %}">
-                    <img src="{% static 'images/with/plain_vertical_black_100h.png' %}"
+                    <img id="main-logo"
+                         src="{% static 'images/with/plain_vertical_black_100h.png' %}"
                          style="vertical-align: middle; width: 220px; height: auto;"
                          alt="W.I.T.H Logo">
                 </a>
@@ -64,8 +65,8 @@
             <!-- Search -->
             <div id="search">
                 <div id="search-logo"><img src="{% static 'images/with/plain_vertical_white_100h.png' %}" alt="W.I.T.H Logo"></div>
-                <button id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i
-                        class="icon-x"></i></button>
+                <button id="btn-search-close" class="btn-search-close" aria-label="Close search form">
+                    <i class="icon-x"></i></button>
                 <form class="search-form" action="search-results-page.html" method="get">
                     <input class="form-control" name="q" type="search" placeholder="Search..."
                         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
@@ -108,19 +109,18 @@
                     <nav>
                         <ul>
                             <li><a href={% url 'index' %}>Home</a></li>
-                            <li><a href={% url 'index' %}#application>봉사 및 행사 신청</a></li>
+                            <li class="dropdown"> <a href="#">소개</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href={% url 'managers' %}>역대 운영진</a></li>
+                                </ul>
+                            </li>
+                            <li><a href={% url 'index' %}#application>봉사&행사 신청</a></li>
                             <!--<li class="dropdown"> <a href={% url 'index' %}#kakao>카톡 알림 신청</a>
                                 <ul class="dropdown-menu">
                                     <li><a href={% url 'kakao' %}>카톡 인증 및 신청</a></li>
                                 </ul>
                             </li>-->
-                            <li><a href={% url 'index' %}#events>캘린더</a></li>
-                            <!--<li class="dropdown"> <a href="#">사람들</a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">위드 단원</a></li>
-                                    <li><a href="#">도움을 주시는 분들</a></li>
-                                </ul>
-                            </li>-->
+                            <li><a href={% url 'calendar' %}>캘린더</a></li>
                             <li><a href={% url 'index' %}#faq>
                                 FAQs
                                 <i class="fa fa-exclamation" aria-hidden="true" style="color: skyblue;"></i>
@@ -187,16 +187,25 @@
 
 
 
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="{% static 'js/popper.min.js' %}"></script>
-<script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
 
- <!--Plugins-->
- <script src="{% static 'js/plugins.js' %}"></script>
+     <!--Plugins-->
+     <script src="{% static 'js/plugins.js' %}"></script>
 
 
-<!--Template functions-->
- <script src="{% static 'js/functions.js' %}"></script>
+    <!--Template functions-->
+    <script src="{% static 'js/functions.js' %}"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-165397457-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-165397457-1');
+    </script>
 
 </body>
 

@@ -62,10 +62,18 @@ DAYS_OF_WEEK = (
 STAFF_CATEGORY = (
     (0, '단장'),
     (1, '부단장'),
-    (2, '새봉 대표봉사자'),
-    (3, '새봉 부대표봉사자'),
-    (4, '은봉 대표봉사자'),
-    (5, '나봉 대표봉사자')
+    (2, '새벽배식봉사 대표봉사자'),
+    (3, '새벽배식봉사 부대표봉사자'),
+    (4, '은혜로운집 봉사 대표봉사자'),
+    (5, '나눔의집 봉사 대표봉사자'),
+    (6, '꿈나무마을 봉사 대표봉사자'),
+    (7, '총무'),
+    (8, '성가정복지병원 봉사 대표봉사자')
+)
+
+STAFF_STATUS = (
+    (0, '재임'),
+    (1, '사임'),
 )
 
 FQT_CATEGORY = {
@@ -77,6 +85,22 @@ FQT_CATEGORY = {
 MISCELLANEOUS_TYPE = {
     (0, 'FAQ'),
     (1, 'FAQ_description'),
+}
+
+INVENTORY_CATEGORY = {
+    (0, '양념'),
+    (1, '장'),
+    (3, '가루'),
+    (4, '기름'),
+    (2, '소스'),
+    (5, '술'),
+    (6, '기타'),
+}
+
+STOCK_AMOUNT = {
+    (0, '구입 필요'),
+    (1, '적당'),
+    (2, '많음'),
 }
 
 YEAR_CHOICES = [(r,r) for r in range(1984, datetime.date.today().year+1)]
@@ -202,10 +226,38 @@ class EventApplication(models.Model):
         return "[{}] {} - {}".format(self.status, self.e.title, self.m.name)
 
 
+class Inventory(models.Model):
+    category1 = models.IntegerField(choices=INVENTORY_CATEGORY, default=0)
+    category2 = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'INVENTORY'
+        unique_together = (('category1', 'category2'),)
+
+    def __str__(self):
+        return "{} - {}".format(self.category1, self.category2)
+
+
+class EventInventory(models.Model):
+    e = models.ForeignKey(Event, verbose_name='Event', on_delete=models.PROTECT)
+    i = models.ForeignKey(Inventory, verbose_name='Inventory', on_delete=models.PROTECT)
+    amount = models.IntegerField(_('Stock amount'), choices=STOCK_AMOUNT, default=0)
+
+    class Meta:
+        managed = True
+        db_table = 'EVENT_INVENTORY'
+        unique_together = (('e', 'i', 'amount'),)
+
+    def __str__(self):
+        return "{} - {} - {}".format(self.e, self.i, self.amount)
+
+
 class Staff(models.Model):
     m = models.ForeignKey(Member, verbose_name='Member', on_delete=models.PROTECT)
     staff_category = models.IntegerField(_('Staff category'), choices=STAFF_CATEGORY, default=None)
     staff_year = models.IntegerField(_('Year'), choices=YEAR_CHOICES, default=datetime.datetime.now().year)
+    staff_status = models.IntegerField(_('Staff statue'), choices=STAFF_STATUS, default=0)
 
     class Meta:
         managed = True

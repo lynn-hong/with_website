@@ -4,8 +4,6 @@
 
 {% block page_content %}
 
-
-
     <section class="p-t-50 p-b-120">
         <div class="container" style="padding: 0 !important;">
             <div class="row">
@@ -13,7 +11,7 @@
                     <h2>봉사 신청이 완료되었습니다!</h2>
                     <p>나는 네가 한 일을, 너의 사랑과 믿음과 봉사와 인내를 안다.</p>
                     <a class="btn btn-rounded btn-reveal btn-reveal-left"
-                       href={% url 'index' %}#events >
+                       href={% url 'calendar' %} >
                         <span>봉사 신청 현황 캘린더 바로가기</span>
                         <i class="fa fa-arrow-right"></i>
                     </a>
@@ -29,9 +27,8 @@
     </section>
 
 
-
 <script>
-    document.getElementById('header-inner').style.backgroundColor = "#333333";
+    document.getElementById('header').setAttribute("data-transparent", "false");
 </script>
 
 {% endblock %}
