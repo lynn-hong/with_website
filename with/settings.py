@@ -122,4 +122,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'website', 'static')
 MEDIA_URL = '/static/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website', 'static', 'images')
 JET_SIDE_MENU_COMPACT  =  True
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
