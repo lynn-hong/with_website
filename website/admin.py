@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import ugettext_lazy as _
-from .models import Activity, Event, EventApplication, Member, Miscellaneous, Staff
+from .models import Activity, Event, EventApplication, Inventory, EventInventory, Member, Miscellaneous, Staff
 
 
 textinput_width = '100'
@@ -22,13 +22,13 @@ class ActivityAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {'fields': ('a', 'title', 'desc', 's_date', 'e_date', 'location', 's_time', 'e_time', 'is_simple')}),
+        (None, {'fields': ('a', 'title', 'subtitle', 'desc', 's_date', 'e_date', 'location', 's_time', 'e_time', 'is_simple')}),
         (_('Additional info'), {'fields': ('num_of_homeless', 'menu', 'attendee_feedback', 'special_issue')}),
     )
-    list_display = ['id', 'a', 'title', 'desc', 's_date', 'e_date', 's_time', 'e_time', 'is_simple']
+    list_display = ['id', 'a', 'title', 'subtitle', 'desc', 's_date', 'e_date', 's_time', 'e_time', 'is_simple']
     list_display_links = ['title']
     list_filter = ['a', 's_date']
-    search_fields = ['a', 'title', 'desc']
+    search_fields = ['a', 'title', 'subtitle', 'desc']
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': textinput_width})},
     }
@@ -73,7 +73,7 @@ class EventApplicationAdmin(admin.ModelAdmin):
     list_display = ['e', 'm', 'status', 'morning_call', 'attendance', 'applied_datetime']
     list_display_links = ['e']
     list_filter = ['e__title', 'm__name', 'attendance']
-    search_fields = ['e__title', 'm__name']
+    search_fields = ['e__title', 'm__name', 'e__id']
 
 
 @admin.register(Miscellaneous)
