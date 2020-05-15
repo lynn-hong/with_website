@@ -40,11 +40,12 @@ MEMBER_CATEGORY = (
     (4, '기타'),
 )
 MEMBER_STATUS = (
-    (0, '활동중'),
-    (1, '휴단'),
-    (2, '탈단'),
+    (0, '정단원'),
+    (1, '휴단원'),
+    (2, '탈단원'),
     (3, '해당없음'),
     (4, '비신자단원'),
+    (5, '준단원'),
 )
 GENDER = (
     (0, '여성'),
@@ -127,6 +128,7 @@ class Activity(models.Model):
 class Event(models.Model):
     a = models.ForeignKey(Activity, verbose_name='Activity title', on_delete=models.PROTECT)
     title = models.CharField(_('Event title'), max_length=255, default="")
+    subtitle = models.CharField(_('Event subtitle'), max_length=255, blank=True, null=True)
     desc = models.TextField(_('Description'), blank=True, null=True)
     s_date = models.DateField(_('Start date'), blank=True, null=True)
     e_date = models.DateField(_('End date'), blank=True, null=True)
