@@ -8,7 +8,7 @@
     <meta name="author" content="Lynn Hong" />
     <meta name="description" content="서교동성당 청년봉사단체 W.I.T.H">
     <!-- Document title -->
-    <title>위드 | 서교동성당 청년봉사단체</title>
+    <title>W.I.T.H 서교동성당 청년봉사단체 | {{ page_title }}</title>
     <!-- Stylesheets & Fonts -->
     <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -72,27 +72,6 @@
                         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
                     <span class="text-muted">Start typing & press "Enter" or "ESC" to close</span>
                 </form>
-
-                <div class="search-suggestion-wrapper">
-                    <div class="search-suggestion">
-                        <h3>News Articles</h3>
-                        <p><a href="#">Beautiful nature, and rare feathers!</a></p>
-                        <p><a href="#">New costs and rise of the economy!</a></p>
-                        <p><a href="#">A true story, that never been told!</a></p>
-                    </div>
-                    <div class="search-suggestion">
-                        <h3>Looking for these?</h3>
-                        <p><a href="#">New costs and rise of the economy!</a></p>
-                        <p><a href="#">AI can be trusted to take answer calls </a></p>
-                        <p><a href="#">Polo now lets you easily create any beautiful clean website</a></p>
-                    </div>
-                    <div class="search-suggestion">
-                        <h3>Blog Posts</h3>
-                        <p><a href="#">A true story, that never been told!</a></p>
-                        <p><a href="#">Beautiful nature, and rare feathers!</a></p>
-                        <p><a href="#">The most happiest time of the day!</a></p>
-                    </div>
-                </div>
             </div>
             <!-- end: search -->
 
@@ -109,14 +88,13 @@
                     <nav>
                         <ul>
                             {% if user.is_authenticated %}
-                              <li><a style="color: skyblue;">{{ user.name }} {{ user.baptismal_name }} 님</a></li>
+                              <li><a style="color: #00bcd4;">{{ user.name }} {{ user.baptismal_name }} 님</a></li>
                             {% endif %}
                             <li class="dropdown"> <a href="#">소개</a>
                                 <ul class="dropdown-menu">
                                     <li><a href={% url 'managers' %}>역대 운영진</a></li>
-                                    <li><a href={% url 'index' %}#faq>
-                                        FAQ
-                                        </a>
+                                    <li><a href={% url 'members' %}>단원 현황</a></li>
+                                    <li><a href={% url 'faq' %}>FAQ</a>
                                     </li>
                                 </ul>
                             </li>
@@ -126,13 +104,25 @@
                                     <li><a href={% url 'kakao' %}>카톡 인증 및 신청</a></li>
                                 </ul>
                             </li>-->
-                            <li><a href={% url 'calendar' %}>캘린더</a></li>
+                            <li>
+                                <a href={% url 'calendar' %}>
+                                    캘린더
+                                    {% if user.is_authenticated %}
+                                        (<span style="color: #00bcd4;">출첵</span>)
+                                    {% endif %}
+                                </a>
+                            </li>
                             {% if user.is_authenticated %}
-                              <li><a href="{% url 'logout' %}" style="color: skyblue;">logout</a></li>
+                                <li>
+                                    <a href="{% url 'download' %}">
+                                        <span style="color: #00bcd4;">통계</span>
+                                    </a>
+                                </li>
+                                <li><a href="{% url 'logout' %}" style="color: #00bcd4;">logout</a></li>
                             {% else %}
                                 <li>
                                     <a href="{% url 'login' %}">관리자 login
-                                        <i class="fa fa-exclamation" aria-hidden="true" style="color: skyblue;"></i>
+                                        <i class="fa fa-exclamation" aria-hidden="true" style="color: #00bcd4;"></i>
                                     </a>
                                 </li>
                             {% endif %}
@@ -149,7 +139,6 @@
 
     {% block page_content %}
     {% endblock %}
-
 
 
     <!-- Footer -->
