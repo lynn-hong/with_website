@@ -1,0 +1,24 @@
+{% block page_menu_content %}
+    <!-- Page Menu -->
+    <div class="page-menu menu-rounded">
+        <div class="container">
+            <nav>
+                <ul>
+                    <li {% if page_title == "역대 운영진" %} class='active' {% endif %}>
+                        <a href="{% url 'managers' %}">역대 운영진</a>
+                    </li>
+                    <li {% if page_title == "단원 현황" %} class='active' {% endif %}>
+                        <a href="{% url 'members' %}">단원 현황</a>
+                    </li>
+                    <li {% if page_title == "FAQs" %} class="active"{% endif %}>
+                        <a href="{% url 'faq' %}">FAQ</a>
+                    </li>
+                </ul>
+            </nav>
+            <div id="pageMenu-trigger">
+                <i class="fa fa-bars"></i>
+            </div>
+        </div>
+    </div>
+    <!-- end: Page Menu -->
+{% endblock %}
