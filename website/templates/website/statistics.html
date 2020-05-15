@@ -1,0 +1,83 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+<!-- Bootstrap daterangepicker css -->
+<link href="{% static 'js/plugins/components/daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+
+<script>
+    setDownloadDateRange = function () {
+        var data = $('#downloadForm1').serializeArray();
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: data,
+            success: function (response) {
+                var element = window.document.createElement('a');
+                element.setAttribute('href', {% static '' %} + response);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            },
+            error: function (data) {
+                var errorMessage = 'Error: ' + data.responseJSON.error;
+                alert(errorMessage);
+            }
+        });
+    };
+</script>
+
+<!-- Section -->
+<section class="p-t-50 p-b-120">
+    <div class="container" style="padding: 0 !important;">
+        <div class="row">
+            <div class="center col-lg-6 m-b-20">
+                <div class="form-group background-white p-30">
+                    <form id="downloadForm1" method="post">
+                        {% csrf_token %}
+                        <h3>회합자료 제작용 봉사 참여 현황 다운로드</h3>
+                        <input type="hidden" name="request_name" value="download_excel">
+                        <div class="input-group" id="form_daterangepicker_2">
+                            <input id="date-range-input" type="text" class="form-control" name="date_range"
+                                   placeholder="조회할 날짜 범위를 설정해주세요"/>
+                            <div class="input-group-append">
+                                <div class="input-group-text"><i class="icon-calendar21"></i></div>
+                            </div>
+                        </div>
+                        <div class="float-right p-t-30">
+                            <button id="downloadButton1" class="btn btn-b" type="button"
+                                    onclick="setDownloadDateRange();">Download
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- end: Section -->
+
+
+<!--Plugins-->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/plugins.js' %}"></script>
+
+<!--Bootstrap Datetimepicker component-->
+<script src="{% static 'js/plugins/components/moment.min.js' %}"></script>
+<script src="{% static 'js/plugins/components/daterangepicker/daterangepicker.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        //form_daterangepicker_2
+        $('#form_daterangepicker_2').daterangepicker({}, function (start, end) {
+            $("#form_daterangepicker_2 .form-control").val(start.format("YYYY-MM-DD") + " - " + end.format("YYYY-MM-DD"));
+        });
+    });
+
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+{% endblock %}
