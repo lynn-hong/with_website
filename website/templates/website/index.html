@@ -285,39 +285,6 @@
     <!-- end: 가이드라인 다운로드 링크 -->
 
 
-    <!-- FAQ -->
-    <section id="faq">
-        <div class="container">
-                <div class="heading-text heading-section text-center">
-                    <h2>FAQs</h2>
-                </div>
-            <div class="row">
-                {% for faq in faqs %}
-                <div class="col-lg-6 tmargin15">
-                    <h3>{{ faq.title }} <small>({{ faq.faqs|length }})</small></h3>
-                    <p>{{ faq.meaning }}</p>
-                    <div class="accordion toggle fancy radius clean">
-                        {% for f in faq.faqs %}
-                        <div class="ac-item">
-                            <h5 class="ac-title"><i class="fa fa-question-circle"></i>
-                                {{ f.title }}
-                            </h5>
-                            <div style="" class="ac-content">
-                                {{ f.body|linebreaksbr }}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    <!-- end: FAQ -->
-
-
-
-
 
     <script>
         // 위드 단원인지 게스트인지 여부에 따라 드랍다운 메뉴가 달라지도록 함
