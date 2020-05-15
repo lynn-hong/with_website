@@ -58,7 +58,7 @@
                                 {% for ea in event_applications %}
                                 <tr>
                                     <th scope="row">{{ forloop.counter }}</th>
-                                    <td>{{ ea.m_name }} {{ ea.m_baptismal_name }}{{ ea.is_guest }}</td>
+                                    <td><a href="tel:{{ ea.m_contact }}">{{ ea.m_name }} {{ ea.m_baptismal_name }}{{ ea.is_guest }} <i class="fas fa-phone"></i></a></td>
                                     <td>
                                         <label class="p-radio p-radio" style="display: inline-block;">
                                             <span>참석</span>
