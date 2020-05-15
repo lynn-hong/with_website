@@ -1,19 +1,30 @@
+import os
 import json
+import re
 from datetime import datetime, time, date
 import uuid
 import collections
+import shutil
+import pandas as pd
+import xlwt
 
-from django.views.generic import TemplateView
-from django.shortcuts import render
-from django.db.models import Count, F, Q
-from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse_lazy
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import connection
+from django.db.models import Count, F, Q
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
+from django.views.generic import TemplateView
 
 from .models import Event, EventApplication, Member, Miscellaneous, Staff, \
-    APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY
+    APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY, MEMBER_STATUS
 
+
+PAGE_TITLE = "{}"
 
 class Index(TemplateView):
     template_name = 'website/index.html'
@@ -44,18 +55,6 @@ class Index(TemplateView):
                 full_applied.append(member.id)
         return full_applied
 
-    def get_faqs(self):
-        FQT_CATEGORY2 = {x[1]: x[0] for x in FQT_CATEGORY}
-        faq_list = [{'title': x[1], 'meaning': "", 'faqs': []}
-                    for x in FQT_CATEGORY]
-        for faq in faq_list:
-            for m in Miscellaneous.objects.filter(misc_type=0)\
-                    .filter(faq_category=FQT_CATEGORY2[faq['title']]).values('title', 'body')\
-                    .order_by('ordering'):
-                faq['faqs'].append({'title': m['title'], 'body': m['body']})
-            faq['meaning'] = Miscellaneous.objects.filter(misc_type=1)\
-                .filter(faq_category=FQT_CATEGORY2[faq['title']]).values('body')[0]['body']
-        return faq_list
 
     # 실제 index에 들어가는 context들 만들기
     def get_context_data(self, **kwargs):
@@ -71,7 +70,7 @@ class Index(TemplateView):
         context['all_members'] = Member.objects.all().order_by('name')
         context['app_choices'] = self.get_app_choices()
         context['app_choices_simple'] = self.get_app_choices(is_simple=True)
-        context['faqs'] = self.get_faqs()
+        context['page_title'] = PAGE_TITLE.format('HOME')
         return context
 
 
@@ -161,6 +160,7 @@ def get_events(request):
                         content_type='application/json; charset=utf-8')
 
 
+@method_decorator(login_required, name='dispatch')
 class IndexAttendanceCheck(TemplateView):
 
     template_name = 'website/attendance_check.html'
@@ -200,6 +200,7 @@ class IndexAttendanceCheck(TemplateView):
 
         if len(context['event']) > 0:
             context['event'] = context['event'][0]
+        context['page_title'] = PAGE_TITLE.format('출석체크')
         return context
 
 
@@ -357,6 +358,7 @@ class IndexCalendar(TemplateView):
                 end_datetime = "{} {}".format(datetime.strftime(e.e_date, "%Y-%m-%d"), end_time)
             else:
                 end_datetime = "{} {}".format(datetime.strftime(e.s_date, "%Y-%m-%d"), end_time)
+            event_sub_arr['id'] = e.id
             event_sub_arr['location'] = e.location
             event_sub_arr['start'] = start_datetime
             event_sub_arr['end'] = end_datetime
@@ -380,6 +382,7 @@ class IndexCalendar(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexCalendar, self).get_context_data(**kwargs)
         context['events'], context['special_days'] = self.get_event()
+        context['page_title'] = PAGE_TITLE.format('이벤트 캘린더')
         return context
 
 
@@ -399,4 +402,107 @@ class IndexManager(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexManager, self).get_context_data(**kwargs)
         context['staff_years'] = self.get_staff_by_year()
+        context['page_title'] = PAGE_TITLE.format('역대 운영진')
         return context
+
+
+class IndexMember(TemplateView):
+
+    template_name = 'website/members.html'
+
+    def get_members(self):
+        return_dict = collections.OrderedDict()
+        for m in Member.objects.all().filter(category=0).exclude(member_status=2).order_by('member_status', 'name'):
+            if m.get_member_status_display() not in return_dict:
+                return_dict[m.get_member_status_display()] = [m]
+            else:
+                return_dict[m.get_member_status_display()].append(m)
+        return return_dict
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexMember, self).get_context_data(**kwargs)
+        context['member_status'] = self.get_members()
+        context['page_title'] = PAGE_TITLE.format('단원 현황')
+        return context
+
+
+class IndexFaq(TemplateView):
+
+    template_name = 'website/faq.html'
+
+    def get_faqs(self):
+        FQT_CATEGORY2 = {x[1]: x[0] for x in FQT_CATEGORY}
+        faq_list = [{'title': x[1], 'meaning': "", 'faqs': []}
+                    for x in FQT_CATEGORY]
+        for faq in faq_list:
+            for m in Miscellaneous.objects.filter(misc_type=0)\
+                    .filter(faq_category=FQT_CATEGORY2[faq['title']]).values('title', 'body')\
+                    .order_by('ordering'):
+                faq['faqs'].append({'title': m['title'], 'body': m['body']})
+            faq['meaning'] = Miscellaneous.objects.filter(misc_type=1)\
+                .filter(faq_category=FQT_CATEGORY2[faq['title']]).values('body')[0]['body']
+        return faq_list
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexFaq, self).get_context_data(**kwargs)
+        context['faqs'] = self.get_faqs()
+        context['page_title'] = PAGE_TITLE.format('FAQs')
+        return context
+
+
+def fetch_volunteer_history(s_date, e_date):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM PAST_EVENT_ATTENDEE WHERE s_date >= %s AND s_date < %s;", [s_date, e_date])
+        rows = cursor.fetchall()
+        if len(rows) < 1:
+            return None
+        else:
+            field_names = [i[0] for i in cursor.description]
+            df = pd.DataFrame(list(rows))
+            df.columns = field_names
+            df['status'] = ['참석' if x == 0 else '불참' for x in df['status']]
+            df['category'] = ['단원' if x == 0 else '게스트' for x in df['category']]
+            return df
+
+date_regex = re.compile(r"(\d{4}-\d{2}-\d{2}) - (\d{4}-\d{2}-\d{2})")
+def get_date(date_range):
+    d = date_regex.search(date_range)
+    s_date = d.group(1)
+    e_date = d.group(2)
+    return s_date, e_date
+
+@csrf_protect
+def download(request):
+    # Get data from database
+    if request.method == "GET":
+        # Stuff here to render the view for a GET request
+        context = {'page_title': PAGE_TITLE.format('통계자료 다운로드')}
+        return render(request, 'website/statistics.html', context)
+    elif request.method == "POST":
+        request_name = request.POST.get('request_name', False)
+        if request_name == 'download_excel':
+            date_range = request.POST.get('date_range', False)
+            s_date, e_date = get_date(date_range)
+
+            try:
+                shutil.rmtree(os.path.join(settings.STATIC_ROOT, 'tmp'), ignore_errors=True)
+            except FileNotFoundError:
+                pass
+            os.mkdir(os.path.join(settings.STATIC_ROOT, 'tmp'))
+            file_name = '{}_{}.xlsx'.format(s_date, e_date)
+            file_path = os.path.join(settings.STATIC_ROOT, 'tmp', file_name)
+            df = fetch_volunteer_history(s_date, e_date)
+            if df is not None:
+                with pd.ExcelWriter(file_path) as writer:
+                    df.to_excel(writer, index=False, sheet_name='Sheet1')
+                if os.path.exists(file_path):
+                    response = HttpResponse('/'.join(file_path.split('/')[-2:]), content_type="txt")
+                    response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_name)
+                    return response
+                raise Http404
+            else:
+                msg = "요청하신 날짜 범위에 데이터가 없습니다."
+                print(msg)
+                response = JsonResponse({"success": False, "error": msg})
+                response.status_code = 500
+                return response
