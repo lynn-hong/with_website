@@ -33,6 +33,7 @@
                 events: [
                     {% for e in events %}
                         {
+                            id: "{{ e.id }}",
                             title: "{{ e.title}}",
                             start: '{{ e.start }}',
                             end: '{{ e.end }}',
@@ -95,6 +96,7 @@
                             $("#event_dont_know_cnt").html(event_dont_know_cnt + '명');
                             $("#event_early_leave_cnt").html(event_early_leave_cnt + '명');
                             $("#event_late_cnt").html(event_late_cnt + '명');
+                            $("#attendance-check-btn").attr('onclick', "location.href='/attendance_check_for_admin/"+event.id+"'");
                         }
                     })
                 }
@@ -103,13 +105,12 @@
     </script>
 
 
-
     <!-- 봉사 및 행사 신청 현황 -->
     <section id="events" class="p-t-50 p-b-120" style="border-top: 1px #e9e9e9 solid;">
         <div class="container" style="padding: 0 !important;">
             <div class="row">
                 <div class="col-lg-12 center" style="text-align: center;">
-                    <h2>위드 캘린더</h2>
+                    <h2>봉사&행사 캘린더</h2>
                     <p>* 각 일정을 누르시면 설명과 참석 신청자 명단을 보실 수 있습니다!</p>
                     <div class="container">
                        <div id="calendar"></div>
@@ -139,7 +140,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="float-left">
-                        <button data-dismiss="modal" class="btn btn-b" type="button">Close</button>
+                        <button data-dismiss="modal" class="btn btn-b btn-secondary" type="button">닫기</button>
                     </div>
                 </div>
             </div>
@@ -185,8 +186,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    {% if user.is_authenticated %}
                     <div class="float-left">
-                        <button data-dismiss="modal" class="btn btn-b" type="button">Close</button>
+                        <button id="attendance-check-btn" class="btn btn-b" type="button">출석체크</button>
+                    </div>
+                    {% endif %}
+                    <div class="float-left">
+                        <button data-dismiss="modal" class="btn btn-b btn-secondary" type="button">닫기</button>
                     </div>
                 </div>
             </div>
