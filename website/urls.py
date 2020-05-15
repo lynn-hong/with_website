@@ -10,7 +10,10 @@ urlpatterns = [
     url(r'^thankyou/$', views.thankyou, name='thankyou'),
     url(r'^calendar/$', views.IndexCalendar.as_view(), name='calendar'),
     url(r'^managers/$', views.IndexManager.as_view(), name='managers'),
+    url(r'^members/$', views.IndexMember.as_view(), name='members'),
+    url(r'^faq/$', views.IndexFaq.as_view(), name='faq'),
     url(r'^get_events/$', views.get_events, name='get_events'),
     url(r'^attendance_check_for_admin/(?P<e_id>\d+)$', views.IndexAttendanceCheck.as_view(), name='attendance_check'),
     #url(r'^about/$', views.IndexAbout.as_view(), name='about'),
+    url(r'^download/$', views.download, name='download'),
 ]
