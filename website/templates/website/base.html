@@ -9,6 +9,20 @@
     <meta name="description" content="서교동성당 청년봉사단체 W.I.T.H">
     <!-- Document title -->
     <title>W.I.T.H 서교동성당 청년봉사단체 | {{ page_title }}</title>
+    <!-- favicon & app icons -->
+    <link rel="icon" href="{% static 'favicon/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="android-chrome" sizes="96x96" href="{% static 'favicon/android-chrome-96x96.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <link rel="mask-icon" href="{% static 'favicon/safari-pinned-tab.svg' %}" color="#00bcd4">
+    <meta name="apple-mobile-web-app-title" content="withlove">
+    <meta name="application-name" content="withlove">
+    <meta name="msapplication-config" content="{% static 'favicon/browserconfig.xml' %}" />
+    <meta name="msapplication-TileImage" content="{% static 'favicon/mstile-150x150.png' %}">
+    <meta name="msapplication-TileColor" content="#00bcd4">
+    <meta name="theme-color" content="#ffffff">
     <!-- Stylesheets & Fonts -->
     <link href="{% static 'css/plugins.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -90,7 +104,7 @@
                             {% if user.is_authenticated %}
                               <li><a style="color: #00bcd4;">{{ user.name }} {{ user.baptismal_name }} 님</a></li>
                             {% endif %}
-                            <li class="dropdown"> <a href="#">소개</a>
+                            <li class="dropdown"> <a href="#">단체 소개</a>
                                 <ul class="dropdown-menu">
                                     <li><a href={% url 'managers' %}>역대 운영진</a></li>
                                     <li><a href={% url 'members' %}>단원 현황</a></li>
