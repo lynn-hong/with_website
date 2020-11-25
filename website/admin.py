@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import ugettext_lazy as _
-from .models import Activity, Event, EventApplication, Inventory, EventInventory, Member, Miscellaneous, Staff
+from .models import Activity, Event, EventApplication, Inventory, EventInventory, History, Member, Miscellaneous, Staff
 
 
 textinput_width = '100'
@@ -33,6 +33,18 @@ class EventAdmin(admin.ModelAdmin):
         models.CharField: {'widget': TextInput(attrs={'size': textinput_width})},
     }
     ordering = ('-s_date',)
+
+
+@admin.register(History)
+class HistoryAdmin(admin.ModelAdmin):
+    list_display = ['event_date', 'event_icon', 'event_title', 'event_desc']
+    list_display_links = ['event_title']
+    list_filter = ['event_date']
+    search_fields = ['event_date', 'event_title', 'event_desc']
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': textinput_width})},
+    }
+    ordering = ('-event_date',)
 
 
 @admin.register(Member)
@@ -74,6 +86,20 @@ class EventApplicationAdmin(admin.ModelAdmin):
     list_display_links = ['e']
     list_filter = ['e__title', 'm__name', 'attendance']
     search_fields = ['e__title', 'm__name', 'e__id']
+
+
+@admin.register(Inventory)
+class InventoryAdmin(admin.ModelAdmin):
+    list_display = ['category1', 'category2']
+    list_filter = ['category1']
+    search_fields = ['category1', 'category2']
+
+
+@admin.register(EventInventory)
+class EventInventoryAdmin(admin.ModelAdmin):
+    list_display = ['e', 'i', 'amount']
+    list_filter = ['e', 'i']
+    search_fields = ['e', 'i']
 
 
 @admin.register(Miscellaneous)

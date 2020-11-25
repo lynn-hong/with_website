@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^submit_attendance/$', views.submit_attendance, name='submit_attendance'),
     url(r'^thankyou/$', views.thankyou, name='thankyou'),
     url(r'^calendar/$', views.IndexCalendar.as_view(), name='calendar'),
+    url(r'^info/$', views.IndexInfo.as_view(), name='info'),
     url(r'^managers/$', views.IndexManager.as_view(), name='managers'),
     url(r'^members/$', views.IndexMember.as_view(), name='members'),
     url(r'^faq/$', views.IndexFaq.as_view(), name='faq'),

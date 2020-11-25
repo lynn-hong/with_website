@@ -86,8 +86,8 @@
                     <div class="heading-text heading-section text-center" data-animate="fadeInUp">
                         <h4>봉사 및 행사 신청</h4>
                         <h2>나는 네가 한 일을, <br/>너의 사랑과 믿음과 봉사와 인내를 안다.</h2>
-                        <p class="lead">나눔의 집 봉사는 온라인 신청을 받지 않습니다. 나봉은 대표봉사자에게 별도 문의 부탁드립니다!</p>
-                        <p class="lead">처음 오시는 게스트 분들도 봉사 신청 가능합니다!</p>
+                        <p class="lead">현재 온라인으로는 나눔의 집 봉사는 신청받지 않습니다. 나봉은 대표봉사자에게 별도 문의 부탁드립니다!</p>
+                        <p class="lead">처음 오시는 게스트 분들도 신청 가능합니다!</p>
                         <a class="btn btn-default btn-lg" data-target="#modal-3" data-toggle="modal" href="#">참석 신청하러 가기</a>
                     </div>
                 </div>
@@ -394,6 +394,7 @@
             events_div.empty();
             for (var i = result.length - 1; i >= 0; i--) {
                 events_div.append('<h4 class="tmargin25">[' + result[i].a_title + '] ' + result[i].title + ' (' + result[i].s_date + ')</h4>');
+                events_div.append('<p class="tmargin25">시간: ' + result[i].s_time + ' ~ ' + result[i].e_time + '</p>');
                 if (result[i].alert !== null) {
                     events_div.append('<p style="color: ' + result[i].alert_color + ';">* ' + result[i].alert + '</p>');
                 }

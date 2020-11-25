@@ -1,0 +1,72 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+    <!-- Page title -->
+    <section id="page-title">
+        <div class="container">
+            <div class="page-title">
+                <h2>{{ page_title }}</h2>
+                <span>우리 단체의 지나온 발자취입니다.</span>
+            </div>
+        </div>
+    </section>
+    <!-- end: Page title -->
+
+
+    {% include "website/base_page_menu.html" %}
+
+    <!-- Info -->
+        <section class="p-t-40 p-b-20">
+            <div class="container">
+                <div class="row m-b-40">
+                    <div class="col-lg-6">
+                        <div class="blockquote blockquote-fancy">
+                            <p class="info_p">{{ info_ko.0.body|linebreaks }}</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="blockquote blockquote-fancy">
+                            <p class="info_p">{{ info_en.0.body|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <!-- End of Info -->
+
+    <!--History-->
+        <section class="p-t-40 p-b-20" style="background-color: #f8f9fa;">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="content col-lg-8">
+                        <!-- Timeline -->
+                        <ul class="timeline">
+                            <!--Timeline item-->
+                            {% for past_event in past_events %}
+                            <li class="timeline-item">
+                                <div class="timeline-icon"><i class="{{ past_event.event_icon }}"></i></div>
+                                <h4>{{ past_event.event_title }}</h4>
+                                <div class="timeline-item-date">{{ past_event.event_date|date:"M, Y" }}</div>
+                                <p>{{ past_event.event_desc }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <!-- end: Timeline -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    <!--END: Team members shadow-->
+
+
+<link href="{% static 'plugin/jquery-steps/jquery.steps.css' %}" rel="stylesheet">
+<script src="{% static 'plugin/jquery-steps/jquery.steps.min.js' %}"></script>
+
+<script>
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+{% endblock %}

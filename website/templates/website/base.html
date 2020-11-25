@@ -106,6 +106,7 @@
                             {% endif %}
                             <li class="dropdown"> <a href="#">단체 소개</a>
                                 <ul class="dropdown-menu">
+                                    <li><a href={% url 'info' %}>소개&연혁</a></li>
                                     <li><a href={% url 'managers' %}>역대 운영진</a></li>
                                     <li><a href={% url 'members' %}>단원 현황</a></li>
                                     <li><a href={% url 'faq' %}>FAQ</a>
@@ -183,6 +184,12 @@
                 <div class="text-center tmargin15 font3times">
                     <a href="https://github.com/lynn-hong/with_website" target="_blank">
                         <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCaFt5Pnk7t3CUVDEGDinqOg" target="_blank">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="mailto:with.seokyo@gmail.com" target="_blank">
+                        <i class="fas fa-at"></i>
                     </a>
                 </div>
             </div>

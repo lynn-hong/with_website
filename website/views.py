@@ -20,7 +20,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import TemplateView
 
-from .models import Event, EventApplication, Member, Miscellaneous, Staff, \
+from .models import Event, EventApplication, History, Member, Miscellaneous, Staff, \
     APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY, MEMBER_STATUS
 
 
@@ -177,6 +177,7 @@ class IndexAttendanceCheck(TemplateView):
             each_ea['m_id'] = ea.m.id
             each_ea['m_category'] = ea.m.category
             each_ea['m_name'] = ea.m.name
+            each_ea['m_contact'] = ea.m.cellphone
             each_ea['m_baptismal_name'] = ea.m.baptismal_name if ea.m.baptismal_name is not None else ''
             each_ea['attended'] = '' if ea.status == 1 else 'checked'
             each_ea['is_guest'] = ' (게스트)' if ea.m.category != 0 else ''
@@ -406,6 +407,19 @@ class IndexManager(TemplateView):
         return context
 
 
+class IndexInfo(TemplateView):
+
+    template_name = 'website/info.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexInfo, self).get_context_data(**kwargs)
+        context['past_events'] = History.objects.all().order_by('-event_date')
+        context['info_ko'] = Miscellaneous.objects.filter(misc_type=2)
+        context['info_en'] = Miscellaneous.objects.filter(misc_type=3)
+        context['page_title'] = PAGE_TITLE.format('소개 & 연혁')
+        return context
+
+
 class IndexMember(TemplateView):
 
     template_name = 'website/members.html'
@@ -491,8 +505,44 @@ def download(request):
             os.mkdir(os.path.join(settings.STATIC_ROOT, 'tmp'))
             file_name = '{}_{}.xlsx'.format(s_date, e_date)
             file_path = os.path.join(settings.STATIC_ROOT, 'tmp', file_name)
+            print(file_path)
             df = fetch_volunteer_history(s_date, e_date)
             if df is not None:
+                # response = HttpResponse()
+                # response['content_type'] = 'application/vnd.ms-excel'
+                # response['Content-Disposition'] = 'attachment; filename={}'.format(file_name)
+                #
+                # # creating workbook
+                # wb = xlwt.Workbook(encoding='utf-8')
+                #
+                # # adding sheet
+                # ws = wb.add_sheet("sheet1")
+                #
+                # # Sheet header, first row
+                # font_style = xlwt.XFStyle()
+                # row_num = 0
+                # # get your data, from database or from a text file...
+                # while row_num < df.shape[0]:
+                #     col_num = 0
+                #     while col_num < df.shape[1]:
+                #         ws.write(row_num, col_num, df.values[row_num][col_num], font_style)
+                #         col_num += 1
+                #     row_num += 1
+                # wb.save(response)
+                #
+                # print(response['Content-Disposition'])
+                # return response
+
+                # import io
+                # import xlsxwriter
+                # with io.BytesIO() as b:
+                #     # Use the StringIO object as the filehandle.
+                #     writer = pd.ExcelWriter(b, engine='xlsxwriter')
+                #     df.to_excel(writer, sheet_name='Sheet1')
+                #     writer.save()
+                #     return HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+
+
                 with pd.ExcelWriter(file_path) as writer:
                     df.to_excel(writer, index=False, sheet_name='Sheet1')
                 if os.path.exists(file_path):
@@ -500,6 +550,7 @@ def download(request):
                     response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_name)
                     return response
                 raise Http404
+
             else:
                 msg = "요청하신 날짜 범위에 데이터가 없습니다."
                 print(msg)

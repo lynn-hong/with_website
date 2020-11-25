@@ -1,0 +1,142 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+<!-- Bootstrap daterangepicker css -->
+<link href="{% static 'js/plugins/components/daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+
+<script>
+    setDownloadDateRange = function () {
+        var data = $('#downloadForm1').serializeArray();
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: data,
+            success: function (response) {
+                var element = window.document.createElement('a');
+                element.setAttribute('href', {% static '' %} + response);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            },
+            error: function (data) {
+                var errorMessage = 'Error: ' + data.responseJSON.error;
+                alert(errorMessage);
+            }
+        });
+    };
+
+    setViewDateRange = function () {
+        console.log('setViewDateRange');
+        var data = $('#downloadForm1').serializeArray();
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: data,
+            success: function (response) {
+                $('#datatable').DataTable({
+                    //"ajax": "{% static 'js/plugins/components/datatables/exampleData/arrays.txt' %}"
+                    data: [
+                            [
+                                "Tiger Nixon",
+                                "System Architect",
+                                "Edinburgh",
+                                "5421",
+                                "2011/04/25",
+                                "$320,800"
+                            ]
+                          ]
+                });
+            },
+            error: function (data) {
+                var errorMessage = 'Error: ' + data.responseJSON.error;
+                alert(errorMessage);
+            }
+        });
+    };
+</script>
+
+<!-- Page Content -->
+<section id="page-content" class="no-sidebar">
+    <div class="container">
+        <!-- DataTable -->
+        <div id="page-title" class="row mb-5">
+            <div class="col-lg-6">
+                <form id="downloadForm1" method="post">
+                    {% csrf_token %}
+                    <h3>회합자료 제작용 봉사 참여 현황</h3>
+                    <input type="hidden" name="request_name" value="download_excel">
+                    <div class="input-group" id="form_daterangepicker_2">
+                        <input id="date-range-input" type="text" class="form-control" name="date_range"
+                               onChange="setViewDateRange();"
+                               placeholder="조회할 날짜 범위를 설정해주세요"/>
+                        <div class="input-group-append">
+                            <div class="input-group-text"><i class="icon-calendar21"></i></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6 text-right">
+                <button id="downloadButton2" type="button" class="btn btn-light" onclick="setDownloadDateRange();">
+                    <i class="icon-plus1"></i> Download
+                </button>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" style="padding: 0">
+                <table id="datatable" class="table table-bordered table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Office</th>
+                            <th>Extn.</th>
+                            <th>Start date</th>
+                            <th>Salary</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Office</th>
+                            <th>Extn.</th>
+                            <th>Start date</th>
+                            <th>Salary</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <!-- end: DataTable -->
+    </div>
+</section>
+<!-- end: Page Content -->
+
+
+<!--Plugins-->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/plugins.js' %}"></script>
+
+<!--Bootstrap Datetimepicker component-->
+<script src="{% static 'js/plugins/components/moment.min.js' %}"></script>
+<script src="{% static 'js/plugins/components/daterangepicker/daterangepicker.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        //form_daterangepicker_2
+        $('#form_daterangepicker_2').daterangepicker({}, function (start, end) {
+            $("#form_daterangepicker_2 .form-control").val(start.format("YYYY-MM-DD") + " - " + end.format("YYYY-MM-DD"));
+        });
+    });
+
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+<script src={% static 'js/plugins/components/datatables/datatables.min.js' %}></script>
+
+{% endblock %}

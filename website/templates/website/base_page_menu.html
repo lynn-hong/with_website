@@ -4,6 +4,9 @@
         <div class="container">
             <nav>
                 <ul>
+                    <li {% if page_title == "소개 & 연혁" %} class='active' {% endif %}>
+                        <a href="{% url 'info' %}">소개 & 연혁</a>
+                    </li>
                     <li {% if page_title == "역대 운영진" %} class='active' {% endif %}>
                         <a href="{% url 'managers' %}">역대 운영진</a>
                     </li>

@@ -69,7 +69,7 @@ STAFF_CATEGORY = (
     (5, '나눔의집 봉사 대표봉사자'),
     (6, '꿈나무마을 봉사 대표봉사자'),
     (7, '총무'),
-    (8, '성가복지병원 봉사 대표봉사자')
+    (8, '성가정복지병원 봉사 대표봉사자')
 )
 
 STAFF_STATUS = (
@@ -86,6 +86,8 @@ FQT_CATEGORY = {
 MISCELLANEOUS_TYPE = {
     (0, 'FAQ'),
     (1, 'FAQ_description'),
+    (2, 'Info_ko'),
+    (3, 'Info_en'),
 }
 
 INVENTORY_CATEGORY = {
@@ -198,7 +200,7 @@ class Member(AbstractUser):
 
 class Miscellaneous(models.Model):
     misc_type = models.IntegerField(_('운영용 항목 타입'), choices=MISCELLANEOUS_TYPE, default=0)
-    faq_category = models.IntegerField(_('FAQ 카테고리'), choices=FQT_CATEGORY, default=0)
+    faq_category = models.IntegerField(_('FAQ 카테고리'), choices=FQT_CATEGORY, default=0, blank=True, null=True)
     title = models.CharField(_('제목'), max_length=255, blank=True, null=True)
     body = models.TextField(_('본문'), blank=True, null=True)
     ordering = models.IntegerField(_('노출 순서'), default=0)
@@ -226,6 +228,20 @@ class EventApplication(models.Model):
 
     def __str__(self):
         return "[{}] {} - {}".format(self.status, self.e.title, self.m.name)
+
+
+class History(models.Model):
+    event_date = models.DateField(_('이벤트 날짜'), blank=True, null=True)
+    event_title = models.CharField(_('이벤트 제목'), max_length=255)
+    event_desc = models.CharField(_('이벤트 설명'), max_length=255)
+    event_icon = models.CharField(_('이벤트 아이콘'), max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'HISTORY'
+
+    def __str__(self):
+        return "{}({})".format(self.event_title, self.event_date)
 
 
 class Inventory(models.Model):
