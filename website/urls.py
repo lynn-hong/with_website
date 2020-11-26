@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^calendar/$', views.IndexCalendar.as_view(), name='calendar'),
     url(r'^info/$', views.IndexInfo.as_view(), name='info'),
     url(r'^managers/$', views.IndexManager.as_view(), name='managers'),
+    url(r'^contacts/$', views.IndexManagerContact.as_view(), name='contacts'),
     url(r'^members/$', views.IndexMember.as_view(), name='members'),
     url(r'^faq/$', views.IndexFaq.as_view(), name='faq'),
     url(r'^get_events/$', views.get_events, name='get_events'),

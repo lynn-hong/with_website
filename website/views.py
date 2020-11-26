@@ -65,8 +65,7 @@ class Index(TemplateView):
         already_applied = self.get_already_applied_member()
         context['members'] = Member.objects.all().filter(category=0).exclude(member_status=2).exclude(id__in=already_applied).order_by('name')  # 위드(탈단원 제외)
         context['guests'] = Member.objects.all().filter(category__in=[1, 3]) | Member.objects.all().filter(category=0).filter(member_status=2) # 타단체청년, 게스트 or 위드에서 탈단원
-        context['guests'] = context['guests'].exclude(id__in=already_applied).order_by(
-            'name')  
+        context['guests'] = context['guests'].exclude(id__in=already_applied).order_by('name')
         context['all_members'] = Member.objects.all().order_by('name')
         context['app_choices'] = self.get_app_choices()
         context['app_choices_simple'] = self.get_app_choices(is_simple=True)
@@ -404,6 +403,19 @@ class IndexManager(TemplateView):
         context = super(IndexManager, self).get_context_data(**kwargs)
         context['staff_years'] = self.get_staff_by_year()
         context['page_title'] = PAGE_TITLE.format('역대 운영진')
+        return context
+
+
+class IndexManagerContact(TemplateView):
+
+    template_name = 'website/contacts.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexManagerContact, self).get_context_data(**kwargs)
+        context['staffs'] = Staff.objects.filter(staff_year=date.today().year).exclude(staff_status=1).all().\
+            order_by('staff_category', '-staff_status')
+        print(context['staffs'][0].m.id)
+        context['page_title'] = PAGE_TITLE.format('운영진 연락처')
         return context
 
 
