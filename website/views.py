@@ -321,7 +321,7 @@ class IndexCalendar(TemplateView):
     def get_event_applications(self, e_id):
         # 실참하지 않은 사람들은 띄워주지 않음
         applications = EventApplication.objects.filter(e__id=e_id).exclude(status=2).filter(attendance=True).all().\
-            order_by('-m__is_staff', 'm__category', 'm__name')
+            order_by('m__category', 'm__name')
         returned_applications = list()
         for a in applications:
             if a.m.baptismal_name is not None:
