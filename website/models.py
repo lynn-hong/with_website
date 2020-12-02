@@ -106,7 +106,18 @@ STOCK_AMOUNT = {
     (2, '많음'),
 }
 
-YEAR_CHOICES = [(r,r) for r in range(1984, datetime.date.today().year+1)]
+POST_STATUS = (
+    (0, 'Draft'),
+    (1, 'Publish')
+)
+
+POST_CATEGORY = (
+    (0, '공지사항'),
+    (1, '홍보'),
+    (2, '보도자료')
+)
+
+YEAR_CHOICES = [(r,r) for r in range(1984, datetime.date.today().year+2)]
 
 class Activity(models.Model):
     act_type = models.IntegerField(_('Activity type'), choices=ACTIVITY_TYPE, default=0)
@@ -283,3 +294,23 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.m.name
+
+
+class Post(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(_('제목'), max_length=255, unique=True)
+    author = models.ForeignKey(Member, verbose_name='Member', on_delete=models.PROTECT)
+    category = models.IntegerField(_('카테고리'), choices=POST_CATEGORY, default=0)
+    content = models.TextField(_('본문'), )
+    press_date = models.DateField(_('보도일자'), blank=True, null=True)
+    outlink = models.CharField(_('외부 링크'), max_length=255, blank=True, null=True)
+    created_on = models.DateTimeField(_('작성일시'), auto_now_add=True)
+    updated_on = models.DateTimeField(_('최종 업데이트 일시'), auto_now=True)
+    status = models.IntegerField(_('post 상태'), choices=POST_STATUS, default=0)
+
+    class Meta:
+        ordering = ['-press_date', '-created_on']
+
+    def __str__(self):
+        return self.title

@@ -18,4 +18,6 @@ urlpatterns = [
     url(r'^attendance_check_for_admin/(?P<e_id>\d+)$', views.IndexAttendanceCheck.as_view(), name='attendance_check'),
     #url(r'^about/$', views.IndexAbout.as_view(), name='about'),
     url(r'^download/$', views.download, name='download'),
+    url(r'^blog/$', views.PostList.as_view(), name='blog'),
+    path(r'blog/<slug:pk>', views.PostDetail.as_view(), name='post_detail'),
 ]

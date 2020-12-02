@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import ugettext_lazy as _
-from .models import Activity, Event, EventApplication, Inventory, EventInventory, History, Member, Miscellaneous, Staff
+from .models import Activity, Event, EventApplication, Inventory, EventInventory, History, Member, Miscellaneous, Staff, Post
 
 
 textinput_width = '100'
@@ -119,3 +119,13 @@ class StaffAdmin(admin.ModelAdmin):
     list_filter = ['m', 'staff_category', 'staff_year']
     search_fields = ['m', 'staff_category']
 
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'author', 'category', 'press_date', 'content', 'created_on', 'updated_on', 'status']
+    list_display_links = ['title']
+    list_filter = ['status', 'category']
+    search_fields = ['title', 'author', 'category', 'content', 'created_on', 'updated_on']
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': textinput_width})},
+    }
+    ordering = ('press_date', '-created_on',)

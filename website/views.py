@@ -18,10 +18,10 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from .models import Event, EventApplication, History, Member, Miscellaneous, Staff, \
-    APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY, MEMBER_STATUS
+    APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY, MEMBER_STATUS, Post
 
 
 PAGE_TITLE = "{}"
@@ -476,6 +476,20 @@ class IndexFaq(TemplateView):
         return context
 
 
+class PostList(ListView):
+    template_name = 'website/blog.html'
+    queryset = Post.objects.filter(status=1).order_by('-press_date', '-created_on')
+
+    def get_context_data(self, **kwargs):
+        context = super(PostList, self).get_context_data(**kwargs)
+        # context['page_title'] = PAGE_TITLE.format('Blog')
+        return context
+
+class PostDetail(DetailView):
+    model = Post
+    template_name = 'website/blog_post_detail.html'
+
+
 def fetch_volunteer_history(s_date, e_date):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM PAST_EVENT_ATTENDEE WHERE s_date >= %s AND s_date < %s;", [s_date, e_date])
@@ -553,7 +567,6 @@ def download(request):
                 #     df.to_excel(writer, sheet_name='Sheet1')
                 #     writer.save()
                 #     return HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
-
 
                 with pd.ExcelWriter(file_path) as writer:
                     df.to_excel(writer, index=False, sheet_name='Sheet1')

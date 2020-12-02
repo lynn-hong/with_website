@@ -1,0 +1,79 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+
+
+    <section class="p-t-50 p-b-120">
+        <div class="container" style="padding: 0 !important;">
+
+
+        <!-- Content -->
+        <section id="page-content">
+            <div class="container">
+                <!-- post content -->
+                <!-- Page title -->
+                <div class="page-title">
+                    <h1>Blog</h1>
+                    <div class="breadcrumb float-left">
+                    </div>
+                </div>
+                <!-- end: Page title -->
+                <!-- Blog -->
+                <div id="blog" class="grid-layout post-3-columns m-b-30" data-item="post-item">
+                    {% now "Y-m-d" as todays_date %}
+
+                    {% for post in post_list %}
+                    <!-- Post item-->
+                    <div class="post-item border">
+                        <div class="post-item-wrap">
+                            <div class="post-item-description">
+                                <span class="post-meta-date"><i class="fa fa-calendar-o"></i>{{ post.created_on }}</span>
+                                <span class="post-meta-category"><i class="fa fa-tag"></i>{{ post.get_category_display }}</span>
+                                <h2><a href="{% url 'post_detail' post.id  %}">
+                                    [{{ post.get_category_display }}] {{ post.title }}
+                                    {% if todays_date == post.created_on|date:"Y-m-d" %}
+                                    <span class="badge badge-primary">NEW</span>
+                                    {% endif %}
+                                </a></h2>
+                                <p>{{post.content|slice:":100" }}...</p>
+                                {% if post.press_date %}
+                                    <div class="post-author">
+                                        <p>보도일자: {{ post.press_date }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end: Post item-->
+                    {% endfor %}
+                    <!-- Post item-->
+                </div>
+                <!-- end: Blog -->
+                <!-- Pagination
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-left"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item"><a class="page-link" href="#"><i class="fa fa-angle-right"></i></a></li>
+                </ul>
+                 end: Pagination -->
+            </div>
+            <!-- end: post content -->
+        </section>
+        <!-- end: Content -->
+
+
+        </div>
+    </section>
+
+<script>
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+{% endblock %}

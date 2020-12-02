@@ -130,6 +130,11 @@
                                     {% endif %}
                                 </a>
                             </li>
+                            <li>
+                                <a href={% url 'blog' %}>
+                                    Blog<span class="badge badge-danger">NEW</span>
+                                </a>
+                            </li>
                             {% if user.is_authenticated %}
                                 <li>
                                     <a href="{% url 'download' %}">
