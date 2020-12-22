@@ -69,6 +69,7 @@ class Index(TemplateView):
         context['all_members'] = Member.objects.all().order_by('name')
         context['app_choices'] = self.get_app_choices()
         context['app_choices_simple'] = self.get_app_choices(is_simple=True)
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('HOME')
         return context
 
@@ -200,6 +201,7 @@ class IndexAttendanceCheck(TemplateView):
 
         if len(context['event']) > 0:
             context['event'] = context['event'][0]
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('출석체크')
         return context
 
@@ -382,6 +384,7 @@ class IndexCalendar(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexCalendar, self).get_context_data(**kwargs)
         context['events'], context['special_days'] = self.get_event()
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('이벤트 캘린더')
         return context
 
@@ -402,6 +405,7 @@ class IndexManager(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexManager, self).get_context_data(**kwargs)
         context['staff_years'] = self.get_staff_by_year()
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('역대 운영진')
         return context
 
@@ -415,6 +419,7 @@ class IndexManagerContact(TemplateView):
         context['staffs'] = Staff.objects.filter(staff_year=date.today().year).exclude(staff_status=1).all().\
             order_by('staff_category', '-staff_status')
         print(context['staffs'][0].m.id)
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('운영진 연락처')
         return context
 
@@ -428,6 +433,7 @@ class IndexInfo(TemplateView):
         context['past_events'] = History.objects.all().order_by('-event_date')
         context['info_ko'] = Miscellaneous.objects.filter(misc_type=2)
         context['info_en'] = Miscellaneous.objects.filter(misc_type=3)
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('소개 & 연혁')
         return context
 
@@ -448,6 +454,7 @@ class IndexMember(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexMember, self).get_context_data(**kwargs)
         context['member_status'] = self.get_members()
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('단원 현황')
         return context
 
@@ -472,6 +479,7 @@ class IndexFaq(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexFaq, self).get_context_data(**kwargs)
         context['faqs'] = self.get_faqs()
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('FAQs')
         return context
 
@@ -482,8 +490,10 @@ class PostList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data(**kwargs)
-        # context['page_title'] = PAGE_TITLE.format('Blog')
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
+        context['page_title'] = PAGE_TITLE.format('Blog')
         return context
+
 
 class PostDetail(DetailView):
     model = Post
@@ -516,7 +526,9 @@ def download(request):
     # Get data from database
     if request.method == "GET":
         # Stuff here to render the view for a GET request
-        context = {'page_title': PAGE_TITLE.format('통계자료 다운로드')}
+        context = {'page_title': PAGE_TITLE.format('통계자료 다운로드'),
+                    'institutions': Miscellaneous.objects.filter(misc_type=4).\
+                        values('title', 'body', 'img_file').order_by('?')}
         return render(request, 'website/statistics.html', context)
     elif request.method == "POST":
         request_name = request.POST.get('request_name', False)

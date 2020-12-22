@@ -88,6 +88,7 @@ MISCELLANEOUS_TYPE = {
     (1, 'FAQ_description'),
     (2, 'Info_ko'),
     (3, 'Info_en'),
+    (4, 'related_institution'),
 }
 
 INVENTORY_CATEGORY = {
@@ -209,11 +210,17 @@ class Member(AbstractUser):
     def __str__(self):
         return '{} {}'.format(self.name, self.baptismal_name)
 
+
+def user_directory_path(instance, filename):
+    if type(instance) == Miscellaneous:
+        return os.path.join('miscellaneous', filename)
+
 class Miscellaneous(models.Model):
     misc_type = models.IntegerField(_('운영용 항목 타입'), choices=MISCELLANEOUS_TYPE, default=0)
     faq_category = models.IntegerField(_('FAQ 카테고리'), choices=FQT_CATEGORY, default=0, blank=True, null=True)
     title = models.CharField(_('제목'), max_length=255, blank=True, null=True)
     body = models.TextField(_('본문'), blank=True, null=True)
+    img_file = models.ImageField(_('이미지 파일'), upload_to=user_directory_path, blank=True, null=True)
     ordering = models.IntegerField(_('노출 순서'), default=0)
 
     class Meta:

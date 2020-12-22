@@ -164,6 +164,30 @@
     {% endblock %}
 
 
+    <!-- Page Content -->
+    <section id="page-content">
+        <div class="container">
+            <div class="row">
+                <div class="content col-lg-10">
+                    <div class="row client-logos carousel-description-clients carousel-description-style ">
+                        <div class="col-lg-10">
+                            <div class="carousel dots-grey" data-items="4" data-arrows="true">
+                                {% for institution in institutions %}
+                                <div>
+                                    <a href="{{ institution.body }}" target="_blank">
+                                        <img style="filter: grayscale(1);" alt="{{ institution.title }}" src="/static/images/{{ institution.img_file }}">
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end: Page Content -->
+
     <!-- Footer -->
     <footer id="footer">
         <div class="copyright-content">
