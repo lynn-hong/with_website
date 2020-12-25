@@ -337,14 +337,14 @@ class IndexCalendar(TemplateView):
             )
         return returned_applications
 
-    def get_event(self):
+    def get_event(self, start, end):
         event_arr = []
-        all_events = Event.objects.all()
+        all_events = Event.objects.all().filter(s_date__gte=start).filter(s_date__lte=end)
         for e in all_events:
             event_sub_arr = {}
             applications = self.get_event_applications(e_id=e.id)
             event_sub_arr['title'] = "[{}] {}".format(e.a.title, e.title)
-            event_sub_arr['desc'] = e.desc.replace("\n", "<br />")
+            event_sub_arr['description'] = e.desc.replace("\n", "<br />")
             if e.s_time is not None:
                 start_time = time.strftime(e.s_time, "%H:%M:%S")
             else:
@@ -364,29 +364,38 @@ class IndexCalendar(TemplateView):
             event_sub_arr['location'] = e.location
             event_sub_arr['start'] = start_datetime
             event_sub_arr['end'] = end_datetime
-            event_sub_arr['applications'] = json.dumps(applications, cls=DjangoJSONEncoder)
+            event_sub_arr['applications'] = json.dumps(applications, cls=DjangoJSONEncoder, ensure_ascii=False)
             event_arr.append(event_sub_arr)
-        special_days_arr = []
+
         for d in Member.objects.filter(category=0).exclude(member_status=2).values('name', 'baptismal_name', 'birthday', 'feast_day', 'gender'):
             gender_desc = "자매님" if d['gender'] == 0 else "형제님"
             if d['birthday'] is not None:
-                special_days_arr.append({'title': "[생일] {} {}".format(d['name'], d['baptismal_name']),
+                event_arr.append({'title': "[생일] {} {}".format(d['name'], d['baptismal_name']),
                                          'start': str(date.today().year) + '-' + d['birthday'].strftime('%m-%d'),
-                                         'desc': "{} {} {}의 생일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
+                                         'description': "{} {} {}의 생일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
                                          'color': 'pink'})
             if d['feast_day'] is not None:
-                special_days_arr.append({'title': "[축일] {} {}".format(d['name'], d['baptismal_name']),
+                event_arr   .append({'title': "[축일] {} {}".format(d['name'], d['baptismal_name']),
                                          'start': str(date.today().year) + '-' + d['feast_day'].strftime('%m-%d'),
-                                         'desc': "{} {} {}의 축일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
+                                         'description': "{} {} {}의 축일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
                                          'color': 'skyblue'})
-        return event_arr, special_days_arr
+        return event_arr
+
 
     def get_context_data(self, **kwargs):
         context = super(IndexCalendar, self).get_context_data(**kwargs)
-        context['events'], context['special_days'] = self.get_event()
         context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('이벤트 캘린더')
         return context
+
+# calendar events
+def get_calendar_events(request):
+    start = request.GET.get('start', None)
+    end = request.GET.get('end', None)
+    c = IndexCalendar()
+    events = c.get_event(start, end)
+    return HttpResponse(json.dumps(events, sort_keys=True, indent=1, cls=DjangoJSONEncoder),
+                        content_type='application/json; charset=utf-8')
 
 
 class IndexManager(TemplateView):

@@ -30,27 +30,7 @@
                 eventTextColor: 'black',
                 eventBorderColor: 'black',
                 eventLimit: true, // allow "more" link when too many events
-                events: [
-                    {% for e in events %}
-                        {
-                            id: "{{ e.id }}",
-                            title: "{{ e.title}}",
-                            start: '{{ e.start }}',
-                            end: '{{ e.end }}',
-                            location: '{{ e.location }}',
-                            description: "{% autoescape off %}{{ e.desc|escapejs }}{% endautoescape %}",
-                            applications: {{ e.applications|safe }}
-                        },
-                    {% endfor %}
-                    {% for d in special_days %}
-                        {
-                            title: "{{ d.title }}",
-                            start: '{{ d.start }}',
-                            description: "{% autoescape off %}{{ d.desc|escapejs }}{% endautoescape %}",
-                            color: '{{ d.color }}'
-                        },
-                    {% endfor %}
-                ],
+                events: "{% url 'get_calendar_events' %}",
                 eventRender: function(event, element) {
                     element.click(function() {
                         if (event.title.indexOf("[생일]") === 0 || event.title.indexOf("[축일]") === 0) {
@@ -75,7 +55,7 @@
                             var event_dont_know_cnt = 0;
                             var event_early_leave_cnt = 0;
                             var event_late_cnt = 0;
-                            $(event.applications).each(function (index, item) {
+                            $($.parseJSON(event.applications)).each(function (index, item) {
                                 if (item.status === "참석") {
                                     $("#event_yes").append( "<li class='lmargin20'>" + item.name + "</li>" );
                                     event_yes_cnt += 1;

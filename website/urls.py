@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^submit_attendance/$', views.submit_attendance, name='submit_attendance'),
     url(r'^thankyou/$', views.thankyou, name='thankyou'),
     url(r'^calendar/$', views.IndexCalendar.as_view(), name='calendar'),
+    url(r'^get_calendar_events/$', views.get_calendar_events, name='get_calendar_events'),
     url(r'^info/$', views.IndexInfo.as_view(), name='info'),
     url(r'^managers/$', views.IndexManager.as_view(), name='managers'),
     url(r'^contacts/$', views.IndexManagerContact.as_view(), name='contacts'),
