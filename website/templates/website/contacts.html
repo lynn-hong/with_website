@@ -3,36 +3,6 @@
 
 
 {% block page_content %}
-    <script>
-        // 인원 추가 submit
-        addAttendeeSubmit = function(){
-            var data = $('#add_attendee_form').serializeArray();
-            $.ajax({
-                type: "POST",
-                url: {% url 'add_attendee' %},
-                data: data,
-                beforeSend: function(){
-                    $('#update_people').html("<img src={% static 'preloader/loader_icon.gif' %} /> 참석자 추가가 진행중입니다!");
-                },
-                success: function(response){ location.replace( window.location.href )},
-            });
-        }
-
-        // 최종 출석체크 submit
-        attendanceCheckSubmit = function(){
-            var data = $('#final_form').serializeArray();
-            $.ajax({
-                type: "POST",
-                url: {% url 'submit_attendance' %},
-                data: data,
-                beforeSend: function(){
-                    $('#final_submit_btn').html("<img src={% static 'preloader/loader_icon.gif' %} /> 출석체크 저장이 진행중입니다!");
-                },
-                success: function(response){ location.reload(); },
-            });
-        }
-    </script>
-
 
     <section class="p-t-50 p-b-120">
         <div class="container" style="padding: 0 !important;">
