@@ -435,6 +435,19 @@ class IndexManagerContact(TemplateView):
         return context
 
 
+class IndexArchive(TemplateView):
+
+    template_name = 'website/board/archive.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexArchive, self).get_context_data(**kwargs)
+        context['posts'] = Post.objects.filter(status=1).filter(category=3).order_by('-press_date', '-created_on')
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
+        context['current'] = 'blog'
+        context['page_title'] = PAGE_TITLE.format('자료실')
+        return context
+
+
 class IndexInfo(TemplateView):
 
     template_name = 'website/info.html'
@@ -499,20 +512,28 @@ class IndexFaq(TemplateView):
 
 
 class PostList(ListView):
-    template_name = 'website/blog.html'
-    queryset = Post.objects.filter(status=1).order_by('-press_date', '-created_on')
+    template_name = 'website/board/blog.html'
+    # category 3 == 자료: 별도 페이지에 있음(archive)
+    queryset = Post.objects.exclude(category=3).filter(status=1).order_by('-press_date', '-created_on')
 
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data(**kwargs)
         context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['current'] = 'blog'
-        context['page_title'] = PAGE_TITLE.format('Blog')
+        context['page_title'] = PAGE_TITLE.format('소식')
         return context
 
 
 class PostDetail(DetailView):
     model = Post
-    template_name = 'website/blog_post_detail.html'
+    template_name = 'website/board/blog_post_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetail, self).get_context_data(**kwargs)
+        context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
+        context['current'] = 'blog'
+        context['page_title'] = PAGE_TITLE.format('post detail')
+        return context
 
 
 def fetch_volunteer_history(s_date, e_date):

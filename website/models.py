@@ -11,6 +11,7 @@ from django import utils
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from django.core.files.storage import FileSystemStorage
 from phonenumber_field.modelfields import PhoneNumberField
 
 ACTIVITY_TYPE = (
@@ -115,7 +116,8 @@ POST_STATUS = (
 POST_CATEGORY = (
     (0, '공지사항'),
     (1, '홍보'),
-    (2, '보도자료')
+    (2, '보도자료'),
+    (3, '자료')
 )
 
 YEAR_CHOICES = [(r,r) for r in range(1984, datetime.date.today().year+2)]
@@ -166,10 +168,16 @@ class Event(models.Model):
             return "{} - {} ({}~{})".format(self.a.title, self.title, self.s_date, self.e_date)
 
 
-
 def user_directory_path(instance, filename):
-    pic_path = {0: 'with', 1: 'youth_other', 2: 'elder_other', 3: 'guest', 4: 'etc'}
-    return os.path.join('images', 'member', pic_path[instance.category], filename)
+    if type(instance) == Miscellaneous:
+        return os.path.join('miscellaneous', filename)
+    elif type(instance) == Member:
+        pic_path = {0: 'with', 1: 'youth_other', 2: 'elder_other', 3: 'guest', 4: 'etc'}
+        return os.path.join('images', 'member', pic_path[instance.category], filename)
+    elif type(instance) == Post:
+        post_path = {0: 'notification', 1: 'ad', 2: 'press', 3: 'archive'}
+        return os.path.join(post_path[instance.category], filename)
+
 
 class Member(AbstractUser):
     email = models.EmailField(_('Email address'), unique=True)
@@ -210,10 +218,6 @@ class Member(AbstractUser):
     def __str__(self):
         return '{} {}'.format(self.name, self.baptismal_name)
 
-
-def user_directory_path(instance, filename):
-    if type(instance) == Miscellaneous:
-        return os.path.join('miscellaneous', filename)
 
 class Miscellaneous(models.Model):
     misc_type = models.IntegerField(_('운영용 항목 타입'), choices=MISCELLANEOUS_TYPE, default=0)
@@ -302,7 +306,6 @@ class Staff(models.Model):
     def __str__(self):
         return self.m.name
 
-
 class Post(models.Model):
 
     id = models.AutoField(primary_key=True)
@@ -312,6 +315,7 @@ class Post(models.Model):
     content = models.TextField(_('본문'), )
     press_date = models.DateField(_('보도일자'), blank=True, null=True)
     outlink = models.CharField(_('외부 링크'), max_length=255, blank=True, null=True)
+    attachment = models.FileField(_('첨부 파일'), upload_to=user_directory_path, blank=True, null=True)
     created_on = models.DateTimeField(_('작성일시'), auto_now_add=True)
     updated_on = models.DateTimeField(_('최종 업데이트 일시'), auto_now=True)
     status = models.IntegerField(_('post 상태'), choices=POST_STATUS, default=0)

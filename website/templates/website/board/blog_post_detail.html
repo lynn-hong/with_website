@@ -1,0 +1,72 @@
+{% extends "website/base.html" %}
+{% load staticfiles %}
+
+
+{% block page_content %}
+
+
+
+    <section class="p-t-50 p-b-120">
+        <div class="container" style="padding: 0 !important;">
+        <div class="col-lg-3">
+            <button type="button"
+                    onclick='location.href={% if post.category != 3 %}"{% url 'blog' %}"{% else %}"{% url 'archive' %}"{% endif %}'
+                    class="btn btn-dark btn-rounded">목록으로</button>
+        </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12 card mb-4  mt-3 left top">
+              <div class="card-body">
+                <h2>[{{ post.get_category_display }}] {% block title %} {{ object.title }} {% endblock title %}</h2>
+                  <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>{% if post.category == 2 %}보도일자{% else %}배포일{% endif %}</td>
+                                <td>{{ post.press_date }}</td>
+                            </tr>
+                            <tr>
+                                <td>작성자</td>
+                                <td>{{ post.author }}</td>
+                            </tr>
+                            <tr>
+                                <td>최종 수정</td>
+                                <td>{{ post.created_on }}</td>
+                            </tr>
+                            {% if post.outlink %}
+                            <tr>
+                                <td>외부 링크 바로가기</td>
+                                <td>
+                                    <a class="btn btn-outline btn-dark"
+                                       href="{{ post.outlink }}"
+                                       target="_blank">
+                                        <i class="fas fa-external-link-alt"></i> Outlink
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if post.attachment %}
+                            <tr>
+                                <td>첨부파일</td>
+                                <td>
+                                    <a class="btn btn-outline btn-dark" href="/static/images/{{ post.attachment }}">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    <p class="card-text ">{{ object.content | safe | linebreaks | urlize  }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+    </section>
+
+<script>
+    document.getElementById('header').setAttribute("data-transparent", "false");
+</script>
+
+{% endblock %}

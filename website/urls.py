@@ -20,5 +20,6 @@ urlpatterns = [
     #url(r'^about/$', views.IndexAbout.as_view(), name='about'),
     url(r'^download/$', views.download, name='download'),
     url(r'^blog/$', views.PostList.as_view(), name='blog'),
+    url(r'^archive/$', views.IndexArchive.as_view(), name='archive'),
     path(r'blog/<slug:pk>', views.PostDetail.as_view(), name='post_detail'),
 ]

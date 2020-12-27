@@ -107,7 +107,7 @@
                             {% if user.is_authenticated %}
                               <li><a style="color: #00bcd4;">{{ user.name }} {{ user.baptismal_name }} 님</a></li>
                             {% endif %}
-                            <li class="dropdown{% if current == 'info' %} current{% endif %}"> <a href="#">단체 소개</a>
+                            <li class="dropdown{% if current == 'info' %} current{% endif %}"> <a href="#">소개</a>
                                 <ul class="dropdown-menu">
                                     <li style="color: gray;"><a href={% url 'info' %}>소개&연혁</a></li>
                                     <li><a href={% url 'managers' %}>역대 운영진</a></li>
@@ -130,10 +130,15 @@
                                     {% endif %}
                                 </a>
                             </li>
-                            <li class="{% if current == 'blog' %} current{% endif %}">
-                                <a href={% url 'blog' %}>
-                                    Blog<span class="badge badge-danger">NEW</span>
-                                </a>
+                            <li class="dropdown {% if current == 'blog' %} current{% endif %}"> <a href="#">게시판</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href={% url 'blog' %}>소식</a></li>
+                                    <li><a href={% url 'archive' %}>
+                                            자료실
+                                            <span class="badge badge-danger">NEW</span>
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                             {% if user.is_authenticated %}
                                 <li class="{% if current == 'download' %} current{% endif %}">
