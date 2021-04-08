@@ -20,7 +20,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import TemplateView, ListView, DetailView
 
-from .models import Event, EventApplication, History, Member, Miscellaneous, Staff, \
+from .models import Event, EventDetail, EventApplication, History, Member, Miscellaneous, Staff, \
     APPLICATION_STATUS, APPLICATION_STATUS_SIMPLE, FQT_CATEGORY, STAFF_CATEGORY, MEMBER_STATUS, Post
 
 
@@ -69,6 +69,10 @@ class Index(TemplateView):
         context['all_members'] = Member.objects.all().order_by('name')
         context['app_choices'] = self.get_app_choices()
         context['app_choices_simple'] = self.get_app_choices(is_simple=True)
+        context['upcoming_volunteers'] = EventDetail.objects.filter(a_type__icontains = "봉").\
+                                         filter(s_date__gte = datetime.now().replace(hour=0,minute=0,second=0)).all()[:5]
+        context['upcoming_events'] = EventDetail.objects.exclude(a_type__contains="봉").\
+                                         filter(s_date__gte = datetime.now().replace(hour=0,minute=0,second=0)).all()[:5]
         context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['page_title'] = PAGE_TITLE.format('HOME')
         return context

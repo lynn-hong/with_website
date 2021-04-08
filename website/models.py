@@ -181,6 +181,28 @@ def user_directory_path(instance, filename):
         return os.path.join(post_path[instance.category], filename)
 
 
+class EventDetail(models.Model):
+    a_type = models.CharField(_('Title'), unique=True, max_length=45)
+    title = models.CharField(_('Event title'), max_length=255, default="")
+    desc = models.TextField(_('Description'), blank=True, null=True)
+    location = models.CharField(_('Location'), max_length=255, blank=True, null=True)
+    s_date = models.DateField(_('Start date'), blank=True, null=True)
+    e_date = models.DateField(_('End date'), blank=True, null=True)
+    s_time = models.TimeField(_('Start time'), blank=True, null=True)
+    e_time = models.TimeField(_('End time'), blank=True, null=True)
+    google_cal_event_id = models.CharField(_('Event subtitle'), max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'EVENT_DETAIL'
+
+    def __str__(self):
+        if self.e_date is None:
+            return "{} - {} ({})".format(self.a_type, self.title, self.s_date)
+        else:
+            return "{} - {} ({}~{})".format(self.a_type, self.title, self.s_date, self.e_date)
+
+
 class Member(AbstractUser):
     email = models.EmailField(_('Email address'), unique=True)
     category = models.IntegerField(choices=MEMBER_CATEGORY, default=0)
@@ -280,6 +302,7 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.m.name
+
 
 class Post(models.Model):
 

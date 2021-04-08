@@ -84,6 +84,87 @@
     </div>
     <!--end: Inspiro Slider -->
 
+
+
+    <!-- upcoming event -->
+    <section id="page-content content background-dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <h2>Upcoming events
+                        <a class="btn btn" onClick='location.href="{% url 'calendar' %}"'>캘린더 보기</a></h2>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Upcoming volunteer opportunities</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                        {% for uv in upcoming_volunteers %}
+                            <li class="list-group-item">
+                                [{{ uv.a_type }}] {{ uv.title }}: {{ uv.s_date|date:"Y-m-d" }} ({{ uv.location }})
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Upcoming events</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                        {% for ue in upcoming_events %}
+                            <li class="list-group-item">
+                                [{{ ue.a_type }}] {{ ue.title }}: {{ ue.s_date|date:"Y-m-d" }} ({{ ue.location }})
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- start: 입단 프로세스 -->
+    <section class="box-fancy text-light background-dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2">
+                    <div class="col-lg-2 text-center" data-animate="fadeInUp" data-animate-delay="200">
+                        <div class="heading-text heading-section">
+                            <h1 class="text-medium">How to join</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-10">
+                    <div class="row">
+                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="400">
+                        <h1 class="text-lg text-uppercase">01.</h1>
+                        <h3>봉사 3회 참여</h3>
+                        <span>게스트 상태로 봉사에 3회 이상 참여하신 후에 입단 신청을 하실 수 있습니다.</span>
+                    </div>
+                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="600">
+                        <h1 class="text-lg text-uppercase">02.</h1>
+                        <h3>입단 신청서 작성</h3>
+                        <span>입단 신청서는 홈페이지의 게시판 > 자료게시판에서 확인하실 수 있습니다.</span>
+                    </div>
+                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="800">
+                        <h1 class="text-lg text-uppercase">03.</h1>
+                        <h3>입단 승인</h3>
+                        <span>필요 시 청년 담당 신부님의 면담을 거친 뒤 입단이 승인됩니다. 2개월의 준단원 기간을 거쳐 정단원으로 승격됩니다.</span>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end: 입단 프로세스 -->
+
+
+
     <!-- 봉사 및 행사 신청 -->
     <section class="p-t-100 p-b-120" id="application">
         <div class="container">
@@ -196,80 +277,8 @@
     </div>
     <!-- end: 봉사신청 modal -->
 
-    <!-- start: 입단 프로세스 -->
-    <section class="box-fancy text-light background-dark">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-2">
-                    <div class="col-lg-2 text-center" data-animate="fadeInUp" data-animate-delay="200">
-                        <div class="heading-text heading-section">
-                            <h1 class="text-medium">How to join</h1>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-10">
-                    <div class="row">
-                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="400">
-                        <h1 class="text-lg text-uppercase">01.</h1>
-                        <h3>봉사 3회 참여</h3>
-                        <span>게스트 상태로 봉사에 3회 이상 참여하신 후에 입단 신청을 하실 수 있습니다.</span>
-                    </div>
-                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="600">
-                        <h1 class="text-lg text-uppercase">02.</h1>
-                        <h3>입단 신청서 작성</h3>
-                        <span>입단 신청서는 홈페이지의 게시판 > 자료게시판에서 확인하실 수 있습니다.</span>
-                    </div>
-                    <div class="col-lg-4 text-center" data-animate="fadeInUp" data-animate-delay="800">
-                        <h1 class="text-lg text-uppercase">03.</h1>
-                        <h3>입단 승인</h3>
-                        <span>필요 시 청년 담당 신부님의 면담을 거친 뒤 입단이 승인됩니다. 2개월의 준단원 기간을 거쳐 정단원으로 승격됩니다.</span>
-                    </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- end: 입단 프로세스 -->
 
 
-    <!-- upcoming event
-    <section id="page-content content background-grey">
-        <div class="container">
-            <div class="row">
-                        <div class="col-lg-12 mb-4">
-                            <h4>upcoming events</h4>
-                        </div>
-                        <div class="col-lg-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    Upcoming events
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Cras justo odio</li>
-                                    <li class="list-group-item">Dapibus ac facilisis in</li>
-                                    <li class="list-group-item">Vestibulum at eros</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    Featured
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Cras justo odio</li>
-                                    <li class="list-group-item">Dapibus ac facilisis in</li>
-                                    <li class="list-group-item">Vestibulum at eros</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="line"></div>
-                        </div>
-            </div>
-        </div>
-    </section>
-     -->
 
     <!-- 카톡 알림신청(call-to-action border)
     <section id="kakao"
