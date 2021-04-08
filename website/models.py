@@ -156,6 +156,8 @@ class Event(models.Model):
     menu = models.TextField(_('식사 메뉴(새봉만 사용)'), blank=True, null=True, default="")
     attendee_feedback = models.TextField(_('참석자 피드백&코멘트'), blank=True, null=True, default="")
     special_issue = models.TextField(_('특이사항&이슈'), blank=True, null=True, default="")
+    is_open = models.BooleanField(_('이벤트 신청을 오픈할 지 여부'), default=True)
+    google_cal_event_id = models.CharField(_('Event subtitle'), max_length=255, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -264,33 +266,6 @@ class History(models.Model):
 
     def __str__(self):
         return "{}({})".format(self.event_title, self.event_date)
-
-
-class Inventory(models.Model):
-    category1 = models.IntegerField(choices=INVENTORY_CATEGORY, default=0)
-    category2 = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'INVENTORY'
-        unique_together = (('category1', 'category2'),)
-
-    def __str__(self):
-        return "{} - {}".format(self.category1, self.category2)
-
-
-class EventInventory(models.Model):
-    e = models.ForeignKey(Event, verbose_name='Event', on_delete=models.PROTECT)
-    i = models.ForeignKey(Inventory, verbose_name='Inventory', on_delete=models.PROTECT)
-    amount = models.IntegerField(_('Stock amount'), choices=STOCK_AMOUNT, default=0)
-
-    class Meta:
-        managed = True
-        db_table = 'EVENT_INVENTORY'
-        unique_together = (('e', 'i', 'amount'),)
-
-    def __str__(self):
-        return "{} - {} - {}".format(self.e, self.i, self.amount)
 
 
 class Staff(models.Model):
