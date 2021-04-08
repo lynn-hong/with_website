@@ -75,7 +75,7 @@ class Index(TemplateView):
 
 
 def fetch_events_by_condition(activity_category):
-    events = Event.objects.all().filter(a__title__in=activity_category) \
+    events = Event.objects.all().filter(is_open=True).filter(a__title__in=activity_category) \
         .filter(Q(s_date=datetime.now().date(), s_time__gte=datetime.now().time()) | Q(
         s_date__gt=datetime.now().date())) \
         .order_by('s_date')
@@ -111,7 +111,7 @@ def check_event_able_to_apply(member_id, member_category, member_status=None, ba
 
 def filter_events_by_member(member_id, member_category):
     activity_category = check_event_able_to_apply(member_id, member_category)
-    events = Event.objects.all().filter(a__title__in=activity_category) \
+    events = Event.objects.all().filter(is_open=True).filter(a__title__in=activity_category) \
         .filter(
         Q(s_date=datetime.now().date(), s_time__gte=datetime.now().time()) | Q(s_date__gt=datetime.now().date())) \
         .order_by('s_date')
