@@ -173,8 +173,13 @@
                     <div class="heading-text heading-section text-center" data-animate="fadeInUp">
                         <h4>봉사 및 행사 신청</h4>
                         <h2>나는 네가 한 일을, <br/>너의 사랑과 믿음과 봉사와 인내를 안다.</h2>
-                        <p class="lead">현재 온라인으로는 나눔의 집 봉사는 신청받지 않습니다. 나봉은 대표봉사자에게 별도 문의 부탁드립니다!</p>
-                        <p class="lead">처음 오시는 게스트 분들도 신청 가능합니다!</p>
+                        <p class="lead">나눔의 집 봉사는 온라인으로 신청받지 않습니다. 대표봉사자에게 별도 문의 부탁드립니다!</p>
+                        <p class="lead">
+                            단원이 아닌 <strong>게스트 분들은 운영진을 통해 신청</strong> 가능합니다!<br/>
+                            문의사항이 있으시면
+                            <a href="mailto:with.seokyo@gmail.com" target="_blank" style="color: #00bcd4;">대표 이메일</a>
+                            로 연락 부탁드립니다 :)
+                        </p>
                         <a class="btn btn-default btn-lg" data-target="#modal-3" data-toggle="modal" href="#">참석 신청하러 가기</a>
                     </div>
                 </div>
@@ -207,7 +212,9 @@
                             <form name="apply_form" id="apply_form">
                                 <select id="category_dropdown" name="cat_id">
                                     <option selected value="with">위드 단원</option>
+                                    {% if user.is_authenticated %}
                                     <option value="guest">게스트</option>
+                                    {% endif %}
                                 </select>
                             <h4 class="tmargin25">신청자 선택</h4>
                                 {% csrf_token %}
