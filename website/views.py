@@ -60,7 +60,8 @@ class Index(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
         #context['events'], context['special_days'] = self.get_event()
-        activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사', '외부봉사', '청소봉사']
+        activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', 
+                             '청년사목회 행사', '미사 관련 봉사', '외부봉사', '청소봉사', '주보봉사', '열체크봉사']
         context['app_events'] = fetch_events_by_condition(activity_category)
         already_applied = self.get_already_applied_member()
         context['members'] = Member.objects.all().filter(category=0).exclude(member_status=2).exclude(id__in=already_applied).order_by('name')  # 위드(탈단원 제외)
@@ -103,7 +104,7 @@ def check_event_able_to_apply(member_id, member_category, member_status=None, ba
         if int(member_category) == 1:  # 위드 단원
             if is_catholic:
                 activity_category = ['새봉', '은봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '미사 관련 봉사',
-                                     '외부봉사', '청소봉사']
+                                     '외부봉사', '청소봉사', '주보봉사', '열체크봉사']
             else:
                 activity_category = ['새봉', '정기회합', '위드X빈첸시오', '위드행사', '청년사목회 행사', '청소봉사']
         else:  # 게스트
@@ -537,6 +538,16 @@ class PostDetail(DetailView):
         context['institutions'] = Miscellaneous.objects.filter(misc_type=4).values('title', 'body', 'img_file').order_by('?')
         context['current'] = 'blog'
         context['page_title'] = PAGE_TITLE.format('post detail')
+        return context
+
+
+class IndexMonthlyAllhands(TemplateView):
+
+    template_name = 'website/monthly.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexMonthlyAllhands, self).get_context_data(**kwargs)
+        context['page_title'] = PAGE_TITLE.format('회합자료')
         return context
 
 

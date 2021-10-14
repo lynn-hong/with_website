@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^blog/$', views.PostList.as_view(), name='blog'),
     url(r'^archive/$', views.IndexArchive.as_view(), name='archive'),
     path(r'blog/<slug:pk>', views.PostDetail.as_view(), name='post_detail'),
+    url(r'^monthly/$', views.IndexMonthlyAllhands.as_view(), name='monthly'),
 ]
