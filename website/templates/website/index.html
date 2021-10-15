@@ -16,7 +16,7 @@
                 },
                 success: function(response){ location.replace( {% url 'thankyou' %} )},
             });
-        }
+        };
 
         $("body").on("submit", "form", function() {
             $(this).submit(function() {
@@ -27,7 +27,8 @@
 
         preparing = function() {
             alert("현재 기능 준비중입니다. 곧 오픈하겠습니다!")
-        }
+        };
+
     </script>
 
 
@@ -223,9 +224,21 @@
                                     <option disabled>────────────</option>
                                     {% for member in members %}
                                         {% if member.get_member_status_display == '휴단원' %}
-                                            <option value={{ member.id }}>{{ member.name }} {{ member.baptismal_name }} ({{ member.get_member_status_display }})</option>
+                                            <option value={{ member.id }}>
+                                                {% if user.is_authenticated %}
+                                                    {{ member.name }}
+                                                {% else %}
+                                                    {{ member.name_masked }}
+                                                {% endif %}
+                                                {{ member.baptismal_name }} ({{ member.get_member_status_display }})</option>
                                         {% else %}
-                                            <option value={{ member.id }}>{{ member.name }} {{ member.baptismal_name }}</option>
+                                            <option value={{ member.id }}>
+                                                {% if user.is_authenticated %}
+                                                    {{ member.name }}
+                                                {% else %}
+                                                    {{ member.name_masked }}
+                                                {% endif %} 
+                                                {{ member.baptismal_name }}</option>
                                         {% endif %}
                                     {% endfor %}
                                 </select>
@@ -496,8 +509,6 @@
                     send_request_to_get_event_options(member_id, 0)
                  });
             });
-
-
 
     </script>
 

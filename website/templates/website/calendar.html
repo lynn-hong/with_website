@@ -56,19 +56,35 @@
                             var event_early_leave_cnt = 0;
                             var event_late_cnt = 0;
                             $($.parseJSON(event.applications)).each(function (index, item) {
-                                if (item.status === "참석") {
-                                    $("#event_yes").append( "<li class='lmargin20'>" + item.name + "</li>" );
-                                    event_yes_cnt += 1;
-                                } else if (item.status === "미정") {
-                                    $("#event_dont_know").append( "<li class='lmargin20'>" + item.name + "</li>" );
-                                    event_dont_know_cnt += 1;
-                                } else if (item.status === "일찍가야함") {
-                                    $("#event_early_leave").append( "<li class='lmargin20'>" + item.name + "</li>" );
-                                    event_early_leave_cnt += 1;
-                                } else if (item.status === "늦참") {
-                                    $("#event_late").append( "<li class='lmargin20'>" + item.name + "</li>" );
-                                    event_late_cnt += 1;
-                                }
+                                {% if user.is_authenticated %}
+                                    if (item.status === "참석") {
+                                        $("#event_yes").append( "<li class='lmargin20'>" + item.name + "</li>" );
+                                        event_yes_cnt += 1;
+                                    } else if (item.status === "미정") {
+                                        $("#event_dont_know").append( "<li class='lmargin20'>" + item.name + "</li>" );
+                                        event_dont_know_cnt += 1;
+                                    } else if (item.status === "일찍가야함") {
+                                        $("#event_early_leave").append( "<li class='lmargin20'>" + item.name + "</li>" );
+                                        event_early_leave_cnt += 1;
+                                    } else if (item.status === "늦참") {
+                                        $("#event_late").append( "<li class='lmargin20'>" + item.name + "</li>" );
+                                        event_late_cnt += 1;
+                                    }
+                                {% else %}
+                                    if (item.status === "참석") {
+                                        $("#event_yes").append( "<li class='lmargin20'>" + item.name_masked + "</li>" );
+                                        event_yes_cnt += 1;
+                                    } else if (item.status === "미정") {
+                                        $("#event_dont_know").append( "<li class='lmargin20'>" + item.name_masked + "</li>" );
+                                        event_dont_know_cnt += 1;
+                                    } else if (item.status === "일찍가야함") {
+                                        $("#event_early_leave").append( "<li class='lmargin20'>" + item.name_masked + "</li>" );
+                                        event_early_leave_cnt += 1;
+                                    } else if (item.status === "늦참") {
+                                        $("#event_late").append( "<li class='lmargin20'>" + item.name_masked + "</li>" );
+                                        event_late_cnt += 1;
+                                    }
+                                {% endif %}
                             });
                             $("#start_time").html(moment(event.start).format('YYYY-MM-DD h:mm A'));
                             $("#end_time").html(moment(event.end).format('YYYY-MM-DD h:mm A'));

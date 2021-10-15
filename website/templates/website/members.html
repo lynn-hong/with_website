@@ -28,10 +28,16 @@
                     <div class="col-lg-3">
                         <div class="team-member">
                             <div class="team-desc">
-                                <h3>{{ member.name }}
+                                <h3>
+                                    {% if user.is_authenticated %}
+                                        {{ member.name }}
+                                    {% else %}
+                                        {{ member.name_masked }}
+                                    {% endif %}
                                     {% if member.baptismal_name %}
-                                    {{ member.baptismal_name }}
-                                    {% endif %}</h3>
+                                        {{ member.baptismal_name }}
+                                    {% endif %}
+                                </h3>
                             </div>
                         </div>
                     </div>

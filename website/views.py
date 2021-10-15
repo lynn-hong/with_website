@@ -26,6 +26,22 @@ from .models import Event, EventDetail, EventApplication, History, Member, Misce
 
 PAGE_TITLE = "{}"
 
+# 이용자 개인정보 보호를 위한 이름 마스킹
+def mask_name_queryset(user_queryset):
+    for user in user_queryset:
+        user.name_masked = mask_name(user.name)
+    return user_queryset
+
+def mask_name(user_name):
+    if 3 <= len(user_name):
+        user_name_masked = user_name[0] + user_name[1:].replace(user_name[1:-1], '*' * (len(user_name) - 2))
+    elif 1 < len(user_name):
+        user_name_masked = user_name[0] + user_name[1:].replace(user_name[1:], '*')
+    else:
+        user_name_masked = user_name
+    return user_name_masked
+
+
 class Index(TemplateView):
     template_name = 'website/index.html'
 
@@ -65,6 +81,7 @@ class Index(TemplateView):
         context['app_events'] = fetch_events_by_condition(activity_category)
         already_applied = self.get_already_applied_member()
         context['members'] = Member.objects.all().filter(category=0).exclude(member_status=2).exclude(id__in=already_applied).order_by('name')  # 위드(탈단원 제외)
+        context['members'] = mask_name_queryset(context['members'])  # append name_masked
         context['guests'] = Member.objects.all().filter(category__in=[1, 3]) | Member.objects.all().filter(category=0).filter(member_status=2) # 타단체청년, 게스트 or 위드에서 탈단원
         context['guests'] = context['guests'].exclude(id__in=already_applied).order_by('name')
         context['all_members'] = Member.objects.all().order_by('name')
@@ -331,18 +348,24 @@ class IndexCalendar(TemplateView):
             order_by('m__category', 'm__name')
         returned_applications = list()
         for a in applications:
+            a.m.name_masked = mask_name(a.m.name)
             if a.m.baptismal_name is not None:
                 a.m.name = "{} {}".format(a.m.name, a.m.baptismal_name)
+                a.m.name_masked = "{} {}".format(a.m.name_masked, a.m.baptismal_name)
             if a.m.get_category_display() != '위드':
                 a.m.name = "(게스트) {}".format(a.m.name)
+                a.m.name_masked = "(게스트) {}".format(a.m.name_masked)
                 if a.m.recommender is not None:
-                    a.m.name = a.m.name + " (invited by {} {})".format(a.m.recommender.name, a.m.recommender.baptismal_name)
+                    a.m.name = a.m.name + " (invited by {} {})".format(a.m.recommender.name,
+                                                                       a.m.recommender.baptismal_name)
+                    a.m.name_masked = a.m.name_masked + " (invited by {} {})".format(mask_name(a.m.recommender.name),
+                                                                                     a.m.recommender.baptismal_name)
             returned_applications.append(
-                {'name': a.m.name, 'status': a.get_status_display()}
+                {'name': a.m.name, 'status': a.get_status_display(), 'name_masked': a.m.name_masked}
             )
         return returned_applications
 
-    def get_event(self, start, end):
+    def get_event(self, start, end, req=None):
         event_arr = []
         all_events = Event.objects.all().filter(s_date__gte=start).filter(s_date__lte=end)
         for e in all_events:
@@ -374,16 +397,23 @@ class IndexCalendar(TemplateView):
 
         for d in Member.objects.filter(category=0).exclude(member_status=2).values('name', 'baptismal_name', 'birthday', 'feast_day', 'gender'):
             gender_desc = "자매님" if d['gender'] == 0 else "형제님"
+            name_merged = "{} {}".format(d['name'], d['baptismal_name']) if d['baptismal_name'] is not None else d['name']
+            name_merged_masked = "{} {}".format(mask_name(d['name']), d['baptismal_name']) if d['baptismal_name'] is not None \
+                else mask_name(d['name'])
             if d['birthday'] is not None:
-                event_arr.append({'title': "[생일] {} {}".format(d['name'], d['baptismal_name']),
-                                         'start': str(date.today().year) + '-' + d['birthday'].strftime('%m-%d'),
-                                         'description': "{} {} {}의 생일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
-                                         'color': 'pink'})
+                event_arr.append({'title': "[생일] {}".format(name_merged) if req is not None and req.user.is_authenticated \
+                                    else "[생일] {}".format(name_merged_masked),
+                                  'description': "{} {}의 생일을 축하합니다!".format(name_merged, gender_desc) if req is not None and req.user.is_authenticated \
+                                    else "{} {}의 생일을 축하합니다!".format(name_merged_masked, gender_desc),
+                                  'start': str(date.today().year) + '-' + d['birthday'].strftime('%m-%d'),
+                                  'color': 'pink'})
             if d['feast_day'] is not None:
-                event_arr   .append({'title': "[축일] {} {}".format(d['name'], d['baptismal_name']),
-                                         'start': str(date.today().year) + '-' + d['feast_day'].strftime('%m-%d'),
-                                         'description': "{} {} {}의 축일을 축하합니다!".format(d['name'], d['baptismal_name'], gender_desc),
-                                         'color': 'skyblue'})
+                event_arr.append({'title': "[축일] {}".format(name_merged) if req is not None and req.user.is_authenticated \
+                                    else "[축일] {}".format(name_merged_masked),
+                                  'description': "{} {}의 축일을 축하합니다!".format(name_merged, gender_desc) if req is not None and req.user.is_authenticated \
+                                    else "{} {}의 축일을 축하합니다!".format(name_merged_masked, gender_desc),
+                                  'start': str(date.today().year) + '-' + d['feast_day'].strftime('%m-%d'),
+                                  'color': 'skyblue'})
         return event_arr
 
 
@@ -399,7 +429,7 @@ def get_calendar_events(request):
     start = request.GET.get('start', None)
     end = request.GET.get('end', None)
     c = IndexCalendar()
-    events = c.get_event(start, end)
+    events = c.get_event(start, end, request)
     return HttpResponse(json.dumps(events, sort_keys=True, indent=1, cls=DjangoJSONEncoder),
                         content_type='application/json; charset=utf-8')
 
@@ -411,6 +441,7 @@ class IndexManager(TemplateView):
     def get_staff_by_year(self):
         return_dict = collections.OrderedDict()
         for s in Staff.objects.all().order_by('-staff_year', 'staff_category', '-staff_status'):
+            s.m.name_masked = mask_name(s.m.name)  # mask name
             if s.staff_year not in return_dict:
                 return_dict[s.staff_year] = [s]
             else:
@@ -474,7 +505,9 @@ class IndexMember(TemplateView):
 
     def get_members(self):
         return_dict = collections.OrderedDict()
-        for m in Member.objects.all().filter(category=0).exclude(member_status=2).order_by('member_status', 'name'):
+        members = Member.objects.all().filter(category=0).exclude(member_status=2).order_by('member_status', 'name')
+        members = mask_name_queryset(members)  # mask names
+        for m in members:
             if m.get_member_status_display() not in return_dict:
                 return_dict[m.get_member_status_display()] = [m]
             else:

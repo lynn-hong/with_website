@@ -36,7 +36,12 @@
                                     <h3>{% if manager.m.name == '김경태' %}
                                             <i class="fas fa-star" ></i>
                                         {% endif %}
-                                        {{ manager.m.name }} {{ manager.m.baptismal_name }}
+                                        {% if user.is_authenticated %}
+                                            {{ manager.m.name }}
+                                        {% else %}
+                                            {{ manager.m.name_masked }}
+                                        {% endif %}
+                                        {{ manager.m.baptismal_name }}
                                         {% if manager.m.name == '김경태' %}
                                             <i class="fas fa-star"></i>
                                         {% endif %}
@@ -45,7 +50,12 @@
                                     <h3>{% if manager.m.name == '김경태' %}
                                             <i class="fas fa-star"></i>
                                         {% endif %}
-                                        {{ manager.m.name }} {{ manager.m.baptismal_name }} (사임)
+                                        {% if user.is_authenticated %}
+                                            {{ manager.m.name }}
+                                        {% else %}
+                                            {{ manager.m.name_masked }}
+                                        {% endif %}
+                                        {{ manager.m.baptismal_name }} (사임)
                                         {% if manager.m.name == '김경태' %}
                                             <i class="fas fa-star"></i>
                                         {% endif %}
